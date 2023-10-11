@@ -11,36 +11,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
-
+//Test de commit
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            SoundPathEmptyTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
-            }
-        }
+        setContentView(R.layout.layout)
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    @Composable
+    fun Greeting(name: String, modifier: Modifier = Modifier) {
+        Text(
+            text = "Hello $name!",
+            modifier = modifier
+        )
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SoundPathEmptyTheme {
-        Greeting("Android")
+    @Preview(showBackground = true)
+    @Composable
+    fun GreetingPreview() {
+        SoundPathEmptyTheme {
+            Greeting("Android")
+        }
     }
 }
