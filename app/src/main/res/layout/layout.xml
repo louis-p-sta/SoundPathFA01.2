@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -11,42 +12,42 @@
         <Button
             android:id="@+id/button9"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="wrap_content"
             android:backgroundTint="#000000"
+            android:text="@string/Start"
             android:textColor="#FFFFFF"
-            android:text="START"
-            android:textSize="96sp"
+            android:textSize="90dp"
             android:textStyle="bold"
             android:visibility="visible" />
         <!--MARKER-->
         <Button
             android:id="@+id/button10"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:text="MARKER"
+            android:layout_height="wrap_content"
             android:backgroundTint="#000000"
+            android:text="@string/Search"
             android:textColor="#FFFFFF"
-            android:textSize="96sp"
+            android:textSize="90dp"
             android:textStyle="bold" />
         <!--ROUTES-->
         <Button
             android:id="@+id/button11"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:text="ROUTES"
+            android:layout_height="wrap_content"
             android:backgroundTint="#000000"
+            android:text="@string/Routes"
             android:textColor="#FFFFFF"
-            android:textSize="96sp"
+            android:textSize="90dp"
             android:textStyle="bold" />
         <!--LOCATION-->
         <Button
             android:id="@+id/button12"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:text="LOCATION"
+            android:layout_height="wrap_content"
             android:backgroundTint="#000000"
+            android:text="@string/Location"
             android:textColor="#FFFFFF"
-            android:textSize="80sp"
+            android:textSize="75dp"
             android:textStyle="bold" />
         <!--SETTINGS-->
         <Button
@@ -54,9 +55,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="#000000"
-            android:text="SETTINGS"
+            android:text="@string/Settings"
             android:textColor="#FFFFFF"
-            android:textSize="80sp"
+            android:textSize="75dp"
             android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

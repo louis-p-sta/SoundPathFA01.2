@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">SoundPathEmpty</string>
+    <string name="Start">START</string>
+    <string name="Marker">MARKER</string>
+    <string name="Routes">ROUTES</string>
+    <string name="Location">LOCATION</string>
+    <string name="Settings">SETTINGS</string>
+    <string name="Search">SEARCH</string>
 </resources>
