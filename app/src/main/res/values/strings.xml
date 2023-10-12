@@ -6,4 +6,6 @@
     <string name="Location">LOCATION</string>
     <string name="Settings">SETTINGS</string>
     <string name="Search">SEARCH</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_gpslocation">GPSLocation</string>
 </resources>
