@@ -24,7 +24,7 @@ class WhereAmI : AppCompatActivity(), LocationListener{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.positiongps)
         title = "LocationPage"
-        val locationbutton: Button = findViewById<Button>(R.id.getLocation)
+        val locationbutton: Button = findViewById(R.id.getLocation)
         locationbutton.setOnClickListener {
             getLocation()
         }

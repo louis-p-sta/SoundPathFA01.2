@@ -11,4 +11,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
-class Routes : ComponentActivity()
+import android.widget.Button
+import android.content.Intent
+class Routes : ComponentActivity(){
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.routes)
+        title = "Routes"
+        val menubutton: Button = findViewById(R.id.menu)
+        menubutton.setOnClickListener {
+            val i = Intent(this@Routes, MainActivity::class.java)
+            startActivity(i)
+        }
+    }
+}

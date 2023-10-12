@@ -8,4 +8,8 @@
     <string name="Search">SEARCH</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_gpslocation">GPSLocation</string>
+    <string name="permission_required">Location Access is required to use this App</string>
+    <string name="ok">OK!</string>
+    <string name="permission_granted">Permission Granted you may now use the App</string>
+
 </resources>
