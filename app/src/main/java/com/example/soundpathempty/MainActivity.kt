@@ -34,100 +34,65 @@ import com.example.soundpathempty.databinding.LayoutBinding
 import com.google.android.material.snackbar.Snackbar
 import android.app.Activity
 import androidx.activity.result.ActivityResultCaller
-
-
-
-
+import androidx.activity.result.registerForActivityResult
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable
+import com.google.android.gms.location.FusedLocationProviderClient
 
 //Test de commit
-class MainActivity : ComponentActivity(){
+class MainActivity : ComponentActivity() {
     private lateinit var layout: View
     private lateinit var binding: LayoutBinding
+    private lateinit var FusedLocationProviderClient: FusedLocationProviderClient
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = LayoutBinding.inflate(layoutInflater)
         val view = binding.root
         layout = binding.mainLayout
         setContentView(view)
-        val test:TextView = findViewById(R.id.PermissionCheck)
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==PackageManager.PERMISSION_DENIED){
-            test.text = "DENIED"
+        var button = findViewById<Button>(R.id.button)
+        button.setOnClickListener {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            )
+                requestPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            )
+                requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            finish();
+            startActivity(getIntent())
         }
-        val routesbutton:Button = findViewById(R.id.routes)
+
+        val test: TextView = findViewById(R.id.PermissionCheck)
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            test.text = "DENIED"
+        } else
+            test.text = "SUCCESS"
+        val routesbutton: Button = findViewById(R.id.routes)
         routesbutton.setOnClickListener {
             val intent = Intent(this@MainActivity, Routes::class.java)
             startActivity(intent)
         }
-        val locationbutton:Button = findViewById(R.id.location)
-        locationbutton.setOnClickListener {
+        val locationbutton: Button = findViewById(R.id.location)
+        locationbutton.setOnClickListener{
             val locationpage = Intent(this@MainActivity, WhereAmI::class.java)
             startActivity(locationpage)
         }
 
     }
-}
-fun View.showSnackbar(
-    view: View,
-    msg: String,
-    length: Int,
-    actionMessage: CharSequence?,
-    action: (View) -> Unit
-) {
-    val snackbar = Snackbar.make(view, msg, length)
-    if (actionMessage != null) {
-        snackbar.setAction(actionMessage) {
-            action(this)
-        }.show()
-    } else {
-        snackbar.show()
-    }
-}
 
-private val requestPermissionLauncher =
-    registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) {isGranted: Boolean->
-        if (isGranted) {
-            Log.i("Permission:", "Granted")
-        } else {
-            Log.i("Permission: ", "Denied")
-        }
-    }
 
-fun onClickRequestPermission(view: View) {
-    when {
-        ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED -> {
-            layout.showSnackbar(
-                view,
-                getString(R.string.permission_granted),
-                Snackbar.LENGTH_INDEFINITE,
-                null
-            ) {}
-        }
 
-        ActivityCompat.shouldShowRequestPermissionRationale(
-            this,
-            Manifest.permission.CAMERA
-        ) -> {
-            layout.showSnackbar(
-                view,
-                getString(R.string.permission_required),
-                Snackbar.LENGTH_INDEFINITE,
-                getString(R.string.ok)
-            ) {
-                requestPermissionLauncher.launch(
-                    Manifest.permission.CAMERA
-                )
-            }
+    private val requestPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            //
         }
-
-        else -> {
-            requestPermissionLauncher.launch(
-                Manifest.permission.CAMERA
-            )
-        }
-    }
+//    val googletest = isGooglePlayServicesAvailable(this)
+//    if g
 }
