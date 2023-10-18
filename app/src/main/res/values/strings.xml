@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">SoundPathEmpty</string>
-    <string name="Start">START</string>
+    <string name="Record">RECORD</string>
     <string name="Marker">MARKER</string>
     <string name="Routes">ROUTES</string>
     <string name="Location">LOCATION</string>
@@ -11,5 +11,5 @@
     <string name="permission_required">Location Access is required to use this App</string>
     <string name="ok">OK!</string>
     <string name="permission_granted">Permission Granted you may now use the App</string>
-
+    <string name = "back_to_menu">Menu</string>
 </resources>

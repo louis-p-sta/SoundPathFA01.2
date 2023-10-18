@@ -14,7 +14,7 @@
             android:layout_height="0dp"
             android:layout_weight="20"
             android:backgroundTint="#000000"
-            android:text="@string/Start"
+            android:text="@string/Record"
             android:textColor="#FFFFFF"
             android:textSize="90sp"
             android:textStyle="bold"
@@ -26,7 +26,7 @@
             android:layout_height="0dp"
             android:layout_weight="20"
             android:backgroundTint="#000000"
-            android:text="@string/Search"
+            android:text="@string/Marker"
             android:textColor="#FFFFFF"
             android:textSize="90sp"
             android:textStyle="bold" />
