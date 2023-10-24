@@ -2,22 +2,27 @@ package com.example.soundpathempty
 
 import android.Manifest
 import android.content.Intent
+import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.location.LocationRequest
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.OnTokenCanceledListener
 import java.lang.String
 import kotlin.Exception
-
+private const val PRIORITY_HIGH_ACCURACY = 100
 class WhereAmI : ComponentActivity() {
     private lateinit var locationManager: LocationManager
     private lateinit var locationListener: LocationListener
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.positiongps)
@@ -37,18 +42,47 @@ class WhereAmI : ComponentActivity() {
                    // "Current location is \n" + "Lat : ${fusedLocationProviderClient.lastLocation.result.latitude}"
                 //println("${fusedLocationProviderClient.getCurrentLocation(1,)}")
                 //println("${fusedLocationProviderClient.lastLocation.result.latitude}")
-                var wayLatitude : Double = 10.0
-                var wayLongitude: Double = 10.0
-                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this) { location ->
-                    println("Location : $location")
-                    if (location != null) {
-                        wayLatitude = location.getLatitude()
-                        wayLongitude = location.getLongitude()
-                    }
-                }
+                //var wayLatitude : Double = 10.0
+                //var wayLongitude: Double = 10.0
+                fusedLocationProviderClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
+                    override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
+                    override fun isCancellationRequested() = false
+                })
+                    .addOnSuccessListener { location: Location? ->
+                        if (location == null) {
+                            Toast.makeText(this, "Cannot get location.", Toast.LENGTH_SHORT).show()
+                            println("Failed to get location.")
+                        }else {
+                            println("We went here.")
+                            println("Woot? ${location.latitude}")
+                            var wayLatitude = location.latitude
+                            var wayLongitude = location.longitude
+                            println("Woot2? ${location.longitude}")
+                            println("$wayLatitude")
+                            gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude}"
+                        }
 
-                println("$wayLatitude")
-                gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}"
+                    }
+
+           /* }
+                fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
+                    override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
+
+                    override fun isCancellationRequested() = false
+                })
+                    .addOnSuccessListener { location: Location? ->
+                        if (location == null)
+                            Toast.makeText(this, "Cannot get location.", Toast.LENGTH_SHORT).show()
+                        else {
+                            val lat = location.latitude
+                            val lon = location.longitude
+                        }
+
+                    }
+
+            }*/
+
+
             }catch(e:Exception) {
                 println("Oops")
             }
