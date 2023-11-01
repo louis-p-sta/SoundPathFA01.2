@@ -2,6 +2,7 @@ package com.example.soundpathempty
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -38,31 +39,41 @@ class WhereAmI : ComponentActivity() {
         val getlocation: Button = findViewById(R.id.getLocation)
         getlocation.setOnClickListener {
             try {
-                //gpslocation.text =
-                   // "Current location is \n" + "Lat : ${fusedLocationProviderClient.lastLocation.result.latitude}"
-                //println("${fusedLocationProviderClient.getCurrentLocation(1,)}")
-                //println("${fusedLocationProviderClient.lastLocation.result.latitude}")
-                //var wayLatitude : Double = 10.0
-                //var wayLongitude: Double = 10.0
-                fusedLocationProviderClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
-                    override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
-                    override fun isCancellationRequested() = false
-                })
-                    .addOnSuccessListener { location: Location? ->
-                        if (location == null) {
-                            Toast.makeText(this, "Cannot get location.", Toast.LENGTH_SHORT).show()
-                            println("Failed to get location.")
-                        }else {
-                            println("We went here.")
-                            println("Woot? ${location.latitude}")
-                            var wayLatitude = location.latitude
-                            var wayLongitude = location.longitude
-                            println("Woot2? ${location.longitude}")
-                            println("$wayLatitude")
-                            gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude}"
-                        }
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    //gpslocation.text =
+                    // "Current location is \n" + "Lat : ${fusedLocationProviderClient.lastLocation.result.latitude}"
+                    //println("${fusedLocationProviderClient.getCurrentLocation(1,)}")
+                    //println("${fusedLocationProviderClient.lastLocation.result.latitude}")
+                    //var wayLatitude : Double = 10.0
+                    //var wayLongitude: Double = 10.0
+                    fusedLocationProviderClient.getCurrentLocation(
+                        PRIORITY_HIGH_ACCURACY,
+                        object : CancellationToken() {
+                            override fun onCanceledRequested(p0: OnTokenCanceledListener) =
+                                CancellationTokenSource().token
 
-                    }
+                            override fun isCancellationRequested() = false
+                        })
+                        .addOnSuccessListener { location: Location? ->
+                            if (location == null) {
+                                Toast.makeText(this, "Cannot get location.", Toast.LENGTH_SHORT)
+                                    .show()
+                                println("Failed to get location.")
+                            } else {
+                                println("We went here.")
+                                println("Woot? ${location.latitude}")
+                                var wayLatitude = location.latitude
+                                var wayLongitude = location.longitude
+                                println("Woot2? ${location.longitude}")
+                                println("$wayLatitude")
+                                gpslocation.text =
+                                    "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude}"
+                            }
+
+                        }
+                }
+                else
+                    gpslocation.text = "Location Permissions DENIED"
 
            /* }
                 fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {

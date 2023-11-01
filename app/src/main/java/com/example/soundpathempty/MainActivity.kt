@@ -84,10 +84,9 @@ class MainActivity : ComponentActivity() {
             val locationpage = Intent(this@MainActivity, WhereAmI::class.java)
             startActivity(locationpage)
         }
-
         val markerbutton: Button = findViewById(R.id.search)
         markerbutton.setOnClickListener {
-            val markerpage = Intent(this@MainActivity, Marker::class.java)
+            val markerpage = Intent(this@MainActivity, Markers::class.java)
             startActivity(markerpage)
         }
     }
