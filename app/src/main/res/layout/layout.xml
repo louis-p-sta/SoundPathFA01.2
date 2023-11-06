@@ -21,7 +21,7 @@
             android:visibility="visible" />
         <!--MARKER-->
         <Button
-            android:id="@+id/search"
+            android:id="@+id/marker"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="20"
@@ -65,24 +65,4 @@
             android:textSize="75sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/PermissionCheck"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="20"
-            android:text="LocationServicesCheck" />
-        <TextView
-            android:id="@+id/GoogleServices"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="20"
-            android:text="GoogleServicesCheck" />
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="20"
-            android:onClick="onClickRequestPermission"
-            android:text="Request Permission" />
 </LinearLayout>

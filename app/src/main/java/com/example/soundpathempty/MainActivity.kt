@@ -35,6 +35,10 @@ import com.google.android.material.snackbar.Snackbar
 import android.app.Activity
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.registerForActivityResult
+import androidx.activity.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.room.Room
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable
@@ -45,31 +49,44 @@ class MainActivity : ComponentActivity() {
     private lateinit var layout: View
     private lateinit var binding: LayoutBinding
     private lateinit var FusedLocationProviderClient: FusedLocationProviderClient
+    private val db by lazy{
+        Room.databaseBuilder(applicationContext,MarkerDatabase::class.java, "Markers.db").build()
+
+    }
+    private val viewModel by viewModels<MarkerViewModel>(
+        factoryProducer = {
+            object: ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return MarkerViewModel(db.dao) as T //Might need a question mark after ViewModel
+                }
+            }
+        }
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = LayoutBinding.inflate(layoutInflater)
         val view = binding.root
         layout = binding.mainLayout
         setContentView(view)
-        var button = findViewById<Button>(R.id.button)
-        button.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            )
-                requestPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            )
-                requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-            finish();
-            startActivity(getIntent())
-        }
+        //var button = findViewById<Button>(R.id.button)
+        /*
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        )
+            requestPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        )
+            requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        finish(); */
+        //startActivity(getIntent())
 
-        val test: TextView = findViewById(R.id.PermissionCheck)
+        //val test: TextView = findViewById(R.id.PermissionCheck)
+        /*
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
             test.text = "DENIED"
         } else
@@ -79,13 +96,14 @@ class MainActivity : ComponentActivity() {
             val intent = Intent(this@MainActivity, Routes::class.java)
             startActivity(intent)
         }
+        */
         val locationbutton: Button = findViewById(R.id.location)
         locationbutton.setOnClickListener{
             val locationpage = Intent(this@MainActivity, WhereAmI::class.java)
             startActivity(locationpage)
         }
 
-        val markerbutton: Button = findViewById(R.id.search)
+        val markerbutton: Button = findViewById(R.id.marker)
         markerbutton.setOnClickListener {
             val markerpage = Intent(this@MainActivity, Marker::class.java)
             startActivity(markerpage)

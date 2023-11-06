@@ -14,4 +14,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "SoundPathEmpty"
 include(":app")
- 
