@@ -26,7 +26,7 @@ private const val PRIORITY_HIGH_ACCURACY = 100
 class MainActivity : ComponentActivity() {
     private lateinit var layout: View
     private lateinit var binding: LayoutBinding
-    //private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     override fun onCreate(savedInstanceState: Bundle?) {
         //requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         //requestPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -71,31 +71,30 @@ class MainActivity : ComponentActivity() {
             val locationpage = Intent(this@MainActivity, WhereAmI::class.java)
             startActivity(locationpage)
         }
-
         val markerbutton: Button = findViewById(R.id.marker)
         markerbutton.setOnClickListener {
             var wayLatitude = 0.0
             var wayLongitude = 0.0
-//            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-//            fusedLocationProviderClient.getCurrentLocation(
-//                PRIORITY_HIGH_ACCURACY,
-//                object : CancellationToken() {
-//                    override fun onCanceledRequested(p0: OnTokenCanceledListener) =
-//                        CancellationTokenSource().token
-//
-//                    override fun isCancellationRequested() = false
-//                })
-//                .addOnSuccessListener { location: Location? -> //This has to be null safe
-//                    if (location != null) {
-//                        wayLatitude = location.latitude
-//                        wayLongitude = location.longitude
-//                        println("Acquired marker location")
-//                        val markerpage = Intent(this@MainActivity, Marker::class.java)
-//                        intent.putExtra("latitude", wayLatitude);
-//                        intent.putExtra("longitude",wayLongitude);
-//                        startActivity(markerpage)
-//                    }
-//                }
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+            fusedLocationProviderClient.getCurrentLocation(
+                PRIORITY_HIGH_ACCURACY,
+                object : CancellationToken() {
+                    override fun onCanceledRequested(p0: OnTokenCanceledListener) =
+                        CancellationTokenSource().token
+
+                    override fun isCancellationRequested() = false
+                })
+                .addOnSuccessListener { location: Location? -> //This has to be null safe
+                    if (location != null) {
+                        wayLatitude = location.latitude
+                        wayLongitude = location.longitude
+                        println("Acquired marker location")
+                        val markerpage = Intent(this@MainActivity, Marker::class.java)
+                        intent.putExtra("latitude", wayLatitude);
+                        intent.putExtra("longitude",wayLongitude);
+                        startActivity(markerpage)
+                    }
+                }
         }
         val routesbutton: Button = findViewById(R.id.routes)
         routesbutton.setOnClickListener {

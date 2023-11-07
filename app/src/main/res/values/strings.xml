@@ -12,4 +12,5 @@
     <string name="ok">OK!</string>
     <string name="permission_granted">Permission Granted you may now use the App</string>
     <string name = "back_to_menu">Menu</string>
+    <string name = "Load_location">Getting location...</string>>
 </resources>

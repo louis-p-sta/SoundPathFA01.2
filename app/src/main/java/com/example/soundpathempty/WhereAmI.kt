@@ -60,6 +60,9 @@ class WhereAmI : ComponentActivity() {
                             var wayLongitude = location.longitude
                             println("Woot2? ${location.longitude}")
                             println("$wayLatitude")
+                            if(wayLatitude is Double){
+                                println("These are doubles")
+                            }
                             gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude}"
                         }
 
