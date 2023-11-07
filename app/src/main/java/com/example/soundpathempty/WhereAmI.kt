@@ -38,6 +38,7 @@ class WhereAmI : ComponentActivity() {
         val getlocation: Button = findViewById(R.id.getLocation)
         getlocation.setOnClickListener {
             try {
+                println("Fetching location...")
                 //gpslocation.text =
                    // "Current location is \n" + "Lat : ${fusedLocationProviderClient.lastLocation.result.latitude}"
                 //println("${fusedLocationProviderClient.getCurrentLocation(1,)}")

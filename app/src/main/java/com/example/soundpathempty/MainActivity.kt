@@ -3,66 +3,33 @@ package com.example.soundpathempty
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
-import android.location.LocationListener
-import android.location.Location
-import android.location.LocationManager
 import android.widget.Button
-import android.widget.TextView
-import android.Manifest
-import android.content.pm.PackageManager
-import android.content.Context
 import android.content.Intent
-import android.health.connect.datatypes.units.Length
-import android.util.Log
+import android.location.Location
 import android.view.View
-import android.widget.ActionMenuView
-import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.example.soundpathempty.databinding.LayoutBinding
-import com.google.android.material.snackbar.Snackbar
-import android.app.Activity
-import androidx.activity.result.ActivityResultCaller
-import androidx.activity.result.registerForActivityResult
 import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable
 import com.google.android.gms.location.FusedLocationProviderClient
-
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.OnTokenCanceledListener
+private const val PRIORITY_HIGH_ACCURACY = 100
 //Test de commit
 class MainActivity : ComponentActivity() {
     private lateinit var layout: View
     private lateinit var binding: LayoutBinding
-    private lateinit var FusedLocationProviderClient: FusedLocationProviderClient
-    private val db by lazy{
-        Room.databaseBuilder(applicationContext,MarkerDatabase::class.java, "Markers.db").build()
-
-    }
-    private val viewModel by viewModels<MarkerViewModel>(
-        factoryProducer = {
-            object: ViewModelProvider.Factory{
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return MarkerViewModel(db.dao) as T //Might need a question mark after ViewModel
-                }
-            }
-        }
-    )
+    //private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     override fun onCreate(savedInstanceState: Bundle?) {
+        //requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        //requestPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
         super.onCreate(savedInstanceState)
         binding = LayoutBinding.inflate(layoutInflater)
         val view = binding.root
@@ -97,6 +64,8 @@ class MainActivity : ComponentActivity() {
             startActivity(intent)
         }
         */
+//        println(R.id.location)
+//        println(findViewById(R.id.location))
         val locationbutton: Button = findViewById(R.id.location)
         locationbutton.setOnClickListener{
             val locationpage = Intent(this@MainActivity, WhereAmI::class.java)
@@ -105,16 +74,40 @@ class MainActivity : ComponentActivity() {
 
         val markerbutton: Button = findViewById(R.id.marker)
         markerbutton.setOnClickListener {
-            val markerpage = Intent(this@MainActivity, Marker::class.java)
-            startActivity(markerpage)
+            var wayLatitude = 0.0
+            var wayLongitude = 0.0
+//            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+//            fusedLocationProviderClient.getCurrentLocation(
+//                PRIORITY_HIGH_ACCURACY,
+//                object : CancellationToken() {
+//                    override fun onCanceledRequested(p0: OnTokenCanceledListener) =
+//                        CancellationTokenSource().token
+//
+//                    override fun isCancellationRequested() = false
+//                })
+//                .addOnSuccessListener { location: Location? -> //This has to be null safe
+//                    if (location != null) {
+//                        wayLatitude = location.latitude
+//                        wayLongitude = location.longitude
+//                        println("Acquired marker location")
+//                        val markerpage = Intent(this@MainActivity, Marker::class.java)
+//                        intent.putExtra("latitude", wayLatitude);
+//                        intent.putExtra("longitude",wayLongitude);
+//                        startActivity(markerpage)
+//                    }
+//                }
+        }
+        val routesbutton: Button = findViewById(R.id.routes)
+        routesbutton.setOnClickListener {
+            val routespage = Intent(this@MainActivity, Routes::class.java)
+            startActivity(routespage)
         }
     }
 
 
-
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            //
+        //
         }
 //    val googletest = isGooglePlayServicesAvailable(this)
 //    if g

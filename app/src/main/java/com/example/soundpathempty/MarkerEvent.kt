@@ -2,6 +2,8 @@ package com.example.soundpathempty
 
 sealed interface MarkerEvent{
     object SaveMarker: MarkerEvent
+    object HideDialog: MarkerEvent
+    object ShowDialog: MarkerEvent
     data class SetName(val name : String):MarkerEvent
     data class SetDescription(val description: String):MarkerEvent
     data class SetLatitude(val latitude: Double):MarkerEvent
