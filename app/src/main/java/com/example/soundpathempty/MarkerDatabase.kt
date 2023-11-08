@@ -14,7 +14,7 @@ abstract class MarkerDatabase: RoomDatabase() {
     abstract val dao: MarkerDao
     companion object {
         @Volatile
-        private var INSTANCE: MarkerDatabase? = null
+        private var INSTANCE: MarkerDatabase? = null //TODO: Read a singleton article.
 
         fun getDatabase(context: Context): MarkerDatabase {
             // if the INSTANCE is not null, then return it,
@@ -32,7 +32,7 @@ abstract class MarkerDatabase: RoomDatabase() {
             return Room.databaseBuilder(
                 context.applicationContext,
                 MarkerDatabase::class.java,
-                "notes_database"
+                "Markers.db"
             )
                 //.addMigrations(MIGRATION_1_2)
                 .build()
