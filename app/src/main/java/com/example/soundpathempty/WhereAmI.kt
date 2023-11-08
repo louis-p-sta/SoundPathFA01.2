@@ -1,6 +1,7 @@
 package com.example.soundpathempty
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.location.LocationListener
@@ -11,11 +12,17 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.room.Query
+import com.example.soundpathempty.MarkerDatabase.Companion.getDatabase
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.String
 import kotlin.Exception
 private const val PRIORITY_HIGH_ACCURACY = 100
@@ -23,10 +30,20 @@ class WhereAmI : ComponentActivity() {
     private lateinit var locationManager: LocationManager
     private lateinit var locationListener: LocationListener
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+suspend fun getAllMarkers(){
+    withContext(Dispatchers.IO) {
+        println("Trying to get markers")
+        val context = applicationContext
+        val db = getDatabase(context = context)
+        val ids = db.dao.getMarkers()
+        println(ids)
+        println("Got all markers")
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.positiongps)
-        title = "Position GPS"
+        title = "@string/Saved_items"
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         //Need a location request, since location is null
         val menubutton: Button = findViewById(R.id.menuButton)
@@ -34,10 +51,11 @@ class WhereAmI : ComponentActivity() {
             val i = Intent(this@WhereAmI, MainActivity::class.java)
             startActivity(i)
         }
+        getAllMarkers() // This needs to run somewhere other than the main thread for us to retrieve this info.
         val gpslocation: TextView = findViewById(R.id.textView)
         val getlocation: Button = findViewById(R.id.getLocation)
         getlocation.setOnClickListener {
-            try {
+
                 println("Fetching location...")
                 //gpslocation.text =
                    // "Current location is \n" + "Lat : ${fusedLocationProviderClient.lastLocation.result.latitude}"
@@ -67,7 +85,6 @@ class WhereAmI : ComponentActivity() {
                         }
 
                     }
-
            /* }
                 fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
                     override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
@@ -86,15 +103,6 @@ class WhereAmI : ComponentActivity() {
 
             }*/
 
-
-            }catch(e:Exception) {
-                println("Oops")
-            }
-        }
-
-        fun GPSPROVIDER(){
-            checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-            val locationManager = fusedLocationProviderClient.lastLocation.result.latitude
 
         }
     }

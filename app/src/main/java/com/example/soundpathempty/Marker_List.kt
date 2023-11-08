@@ -57,7 +57,7 @@ fun MarkerScreen(
                         modifier = Modifier.weight(1f)
                     ){
                         Text(
-                            text = "${marker.name} ${marker.description}"
+                            text = "${marker.name} \n ${marker.description}"
                         )
                         Text(text = "lat: ${marker.latitude} lon: ${marker.longitude}")
                     }

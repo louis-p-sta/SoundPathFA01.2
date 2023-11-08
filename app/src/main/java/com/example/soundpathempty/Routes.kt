@@ -16,9 +16,9 @@ import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
 class Routes : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.routes)
-        title = "Routes"
+        //title = "@string/Saved_items"
+
         val menubutton: Button = findViewById(R.id.retouraumenu)
         menubutton.setOnClickListener {
             val i = Intent(this@Routes, MainActivity::class.java)

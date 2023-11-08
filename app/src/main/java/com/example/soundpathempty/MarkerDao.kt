@@ -13,4 +13,6 @@ interface MarkerDao {
     suspend fun deleteMarker(marker: Marker_Data)
     @Query("SELECT * FROM markers ORDER BY name ASC")
     fun getAll(): Flow<List<Marker_Data>>
+    @Query("SELECT * FROM markers ORDER BY name ASC")
+    fun getMarkers(): List<Marker_Data>
 }

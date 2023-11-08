@@ -2,7 +2,7 @@
     <string name="app_name">SoundPathEmpty</string>
     <string name="Record">RECORD</string>
     <string name="Marker">MARKER</string>
-    <string name="Routes">ROUTES</string>
+    <string name="Saved">SAVED</string>
     <string name="Location">LOCATION</string>
     <string name="Settings">SETTINGS</string>
     <string name="Search">SEARCH</string>
@@ -12,5 +12,6 @@
     <string name="ok">OK!</string>
     <string name="permission_granted">Permission Granted you may now use the App</string>
     <string name = "back_to_menu">Menu</string>
-    <string name = "Load_location">Getting location...</string>>
+    <string name = "Load_location">Getting location...</string>
+    <string name = "Saved_items">Saved items</string>
 </resources>

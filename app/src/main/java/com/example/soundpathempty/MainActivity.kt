@@ -21,6 +21,36 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
+import android.location.LocationListener
+import android.location.LocationManager
+import android.widget.TextView
+import android.Manifest
+import android.content.pm.PackageManager
+import android.content.Context
+import android.health.connect.datatypes.units.Length
+import android.util.Log
+import android.widget.ActionMenuView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.android.material.snackbar.Snackbar
+import android.app.Activity
+import androidx.activity.result.ActivityResultCaller
+import androidx.activity.result.registerForActivityResult
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable
+
 private const val PRIORITY_HIGH_ACCURACY = 100
 //Test de commit
 class MainActivity : ComponentActivity() {
@@ -28,13 +58,27 @@ class MainActivity : ComponentActivity() {
     private lateinit var binding: LayoutBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     override fun onCreate(savedInstanceState: Bundle?) {
-        //requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        //requestPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ){
+            requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            println("Fine statement entered")
+        }
         super.onCreate(savedInstanceState)
         binding = LayoutBinding.inflate(layoutInflater)
         val view = binding.root
         layout = binding.mainLayout
         setContentView(view)
+//        if (ContextCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.ACCESS_FINE_LOCATION
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+//            println("Fine 2 statement entered")
+//        }
         //var button = findViewById<Button>(R.id.button)
         /*
         if (ContextCompat.checkSelfPermission(
@@ -96,13 +140,12 @@ class MainActivity : ComponentActivity() {
                     }
                 }
         }
-        val routesbutton: Button = findViewById(R.id.routes)
+        val routesbutton: Button = findViewById(R.id.saved)
         routesbutton.setOnClickListener {
             val routespage = Intent(this@MainActivity, Routes::class.java)
             startActivity(routespage)
         }
     }
-
 
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->

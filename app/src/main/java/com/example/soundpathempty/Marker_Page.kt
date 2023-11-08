@@ -1,6 +1,5 @@
 package com.example.soundpathempty
 
-import android.content.Intent
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -77,6 +76,9 @@ class Marker : ComponentActivity() {
                 }
 
             }
+        fun getDatabase(): MarkerDatabase? {
+            return db
+        }
 
 //        val receiveIntent = this.getIntent()
 //        var wayLatitude = intent.getDoubleExtra("latitude",10.0)

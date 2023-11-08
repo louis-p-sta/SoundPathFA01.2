@@ -32,12 +32,12 @@
             android:textStyle="bold" />
         <!--ROUTES-->
         <Button
-            android:id="@+id/routes"
+            android:id="@+id/saved"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="20"
             android:backgroundTint="#000000"
-            android:text="@string/Routes"
+            android:text="@string/Saved"
             android:textColor="#FFFFFF"
             android:textSize="90sp"
             android:textStyle="bold"
