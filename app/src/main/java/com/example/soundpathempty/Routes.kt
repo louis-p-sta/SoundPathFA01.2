@@ -12,12 +12,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
-
 class Routes : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.routes)
-        //title = "@string/Saved_items"
+        title = "Saved items"
 
         val menubutton: Button = findViewById(R.id.retouraumenu)
         menubutton.setOnClickListener {

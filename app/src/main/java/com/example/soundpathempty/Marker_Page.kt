@@ -76,9 +76,9 @@ class Marker : ComponentActivity() {
                 }
 
             }
-        fun getDatabase(): MarkerDatabase? {
-            return db
-        }
+//        fun getDatabase(): MarkerDatabase? {
+//            return db
+//        }
 
 //        val receiveIntent = this.getIntent()
 //        var wayLatitude = intent.getDoubleExtra("latitude",10.0)

@@ -117,6 +117,12 @@ class MainActivity : ComponentActivity() {
         }
         val markerbutton: Button = findViewById(R.id.marker)
         markerbutton.setOnClickListener {
+            val routespage = Intent(this@MainActivity, Marker::class.java)
+            startActivity(routespage)
+            //Try to launch alert dialog from here
+        }
+        val routesbutton: Button = findViewById(R.id.saved)
+        routesbutton.setOnClickListener {
             var wayLatitude = 0.0
             var wayLongitude = 0.0
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -139,11 +145,6 @@ class MainActivity : ComponentActivity() {
                         startActivity(markerpage)
                     }
                 }
-        }
-        val routesbutton: Button = findViewById(R.id.saved)
-        routesbutton.setOnClickListener {
-            val routespage = Intent(this@MainActivity, Routes::class.java)
-            startActivity(routespage)
         }
     }
 
