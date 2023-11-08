@@ -13,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.room.ColumnInfo
 import androidx.room.Query
 import com.example.soundpathempty.MarkerDatabase.Companion.getDatabase
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -43,15 +44,19 @@ suspend fun getAllMarkers(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.positiongps)
+        data class markers(
+            @ColumnInfo(name="Latitude") val latitude: String?,
+            @ColumnInfo(name="Longtitude") val longitude: String?
+        )
         title = "@string/Saved_items"
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         //Need a location request, since location is null
+
         val menubutton: Button = findViewById(R.id.menuButton)
         menubutton.setOnClickListener {
             val i = Intent(this@WhereAmI, MainActivity::class.java)
             startActivity(i)
         }
-        //getAllMarkers() // This needs to run somewhere other than the main thread for us to retrieve this info.
         val gpslocation: TextView = findViewById(R.id.textView)
         val getlocation: Button = findViewById(R.id.getLocation)
         getlocation.setOnClickListener {

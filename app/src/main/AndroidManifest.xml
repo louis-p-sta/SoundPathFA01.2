@@ -39,7 +39,7 @@
             android:name=".Routes"
             android:exported="true"
             android:label="Saved Routes"
-            android:theme="@style/Base.CardView" />
+            android:theme="@style/Theme.SoundPathEmpty" />
     </application>
 
 </manifest>
