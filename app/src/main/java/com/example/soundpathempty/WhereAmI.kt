@@ -51,7 +51,7 @@ suspend fun getAllMarkers(){
             val i = Intent(this@WhereAmI, MainActivity::class.java)
             startActivity(i)
         }
-        getAllMarkers() // This needs to run somewhere other than the main thread for us to retrieve this info.
+        //getAllMarkers() // This needs to run somewhere other than the main thread for us to retrieve this info.
         val gpslocation: TextView = findViewById(R.id.textView)
         val getlocation: Button = findViewById(R.id.getLocation)
         getlocation.setOnClickListener {

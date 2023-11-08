@@ -35,7 +35,7 @@ fun MarkerScreen(
             }) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add contact"
+                    contentDescription = "Add Marker"
                 )
             }
         },

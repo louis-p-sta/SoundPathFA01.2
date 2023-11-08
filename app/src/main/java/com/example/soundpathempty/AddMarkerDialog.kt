@@ -63,7 +63,7 @@ fun AddMarkerDialog(
                         onEvent(MarkerEvent.SetDescription(it))
                     },
                     placeholder = {
-                        Text(text = "Marker name")
+                        Text(text = "Description")
                     }
                 )
             }
