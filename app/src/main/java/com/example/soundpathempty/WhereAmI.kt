@@ -3,6 +3,7 @@ package com.example.soundpathempty
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -12,6 +13,8 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.room.ColumnInfo
 import androidx.room.Query
@@ -23,6 +26,7 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.lang.String
 import kotlin.Exception
@@ -51,11 +55,21 @@ suspend fun getAllMarkers(){
         title = "@string/Saved_items"
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         //Need a location request, since location is null
-
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ){
+            requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            println("Fine statement entered")
+        }
         val menubutton: Button = findViewById(R.id.menuButton)
         menubutton.setOnClickListener {
             val i = Intent(this@WhereAmI, MainActivity::class.java)
             startActivity(i)
+        }
+        runBlocking{
+            getAllMarkers()
         }
         val gpslocation: TextView = findViewById(R.id.textView)
         val getlocation: Button = findViewById(R.id.getLocation)
@@ -110,5 +124,10 @@ suspend fun getAllMarkers(){
 
 
         }
+
     }
+    private val requestPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            //
+        }
 }

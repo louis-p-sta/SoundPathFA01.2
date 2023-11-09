@@ -1,5 +1,7 @@
 package com.example.soundpathempty
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -7,9 +9,11 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
@@ -41,6 +45,14 @@ class Marker : ComponentActivity() {
         }
     )
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ){
+            requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            println("Fine statement entered")
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_marker)
         title = "Marker"
@@ -90,4 +102,8 @@ class Marker : ComponentActivity() {
 //            startActivity(i)
 //        }
     }
+    private val requestPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            //
+        }
 }
