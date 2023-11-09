@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SoundPathEmpty</string>
+    <string name="app_name">SoundPath</string>
     <string name="Record">RECORD</string>
     <string name="Marker">MARKER</string>
     <string name="Saved">SAVED</string>

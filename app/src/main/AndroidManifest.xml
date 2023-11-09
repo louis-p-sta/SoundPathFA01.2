@@ -38,7 +38,8 @@
         <activity
             android:name=".Routes"
             android:exported="true"
-            android:theme="@style/Base.CardView" />
+            android:label="Saved Routes"
+            android:theme="@style/Theme.SoundPathEmpty" />
     </application>
 
 </manifest>

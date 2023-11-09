@@ -54,7 +54,7 @@ fun AddMarkerDialog(
                         onEvent(MarkerEvent.SetName(it))
                     },
                     placeholder = {
-                        Text(text = "Marker name")
+                        Text(text = "Name")
                     }
                 )
                 TextField(
@@ -63,7 +63,7 @@ fun AddMarkerDialog(
                         onEvent(MarkerEvent.SetDescription(it))
                     },
                     placeholder = {
-                        Text(text = "Marker name")
+                        Text(text = "Description")
                     }
                 )
             }
