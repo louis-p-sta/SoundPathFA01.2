@@ -1,5 +1,5 @@
 package com.example.soundpathempty
-
+import kotlin.math.*
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -35,14 +35,12 @@ class WhereAmI : ComponentActivity() {
     private lateinit var locationManager: LocationManager
     private lateinit var locationListener: LocationListener
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-suspend fun getAllMarkers(){
-    withContext(Dispatchers.IO) {
-        println("Trying to get markers")
-        val context = applicationContext
-        val db = getDatabase(context = context)
-        val ids = db.dao.getMarkers()
-        println(ids)
-        println("Got all markers")
+ fun getAllMarkers():List<Marker_Data> = runBlocking {
+        withContext(Dispatchers.IO) {
+            val context = applicationContext
+            val db = getDatabase(context = context)
+            val ids = db.dao.getMarkers()
+            return@withContext ids
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,11 +66,10 @@ suspend fun getAllMarkers(){
             val i = Intent(this@WhereAmI, MainActivity::class.java)
             startActivity(i)
         }
-        runBlocking{
-            getAllMarkers()
-        }
         val gpslocation: TextView = findViewById(R.id.textView)
         val getlocation: Button = findViewById(R.id.getLocation)
+        //var wayLongitude = 0.0
+        //var wayLatitude = 0.0
         getlocation.setOnClickListener {
 
                 println("Fetching location...")
@@ -100,10 +97,23 @@ suspend fun getAllMarkers(){
                             if(wayLatitude is Double){
                                 println("These are doubles")
                             }
-                            gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude}"
+                            println("Trying to get markers")
+                            val markerList = getAllMarkers()
+                            val lat1 = wayLatitude
+                            val lon1 = wayLongitude //Test with a different position
+                            val lon2 = markerList[0].longitude
+                            val lat2 = markerList[0].latitude
+                            val name = markerList
+                            val distance =acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon2-lon1))*6371
+                            println("Distance obtained: ${distance}")
+                            gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude} \n Distance obtained: ${distance}"
                         }
 
                     }
+
+
+
+
            /* }
                 fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
                     override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
