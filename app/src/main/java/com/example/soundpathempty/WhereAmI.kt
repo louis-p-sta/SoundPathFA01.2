@@ -99,14 +99,23 @@ class WhereAmI : ComponentActivity() {
                             }
                             println("Trying to get markers")
                             val markerList = getAllMarkers()
-                            val lat1 = wayLatitude
-                            val lon1 = wayLongitude //Test with a different position
+                            val lat = wayLatitude
+                            val lon = wayLongitude //Test with a different position
+                            val lat1 = 33.850018
+                            val lon1 = -84.37207
                             val lon2 = markerList[0].longitude
                             val lat2 = markerList[0].latitude
-                            val name = markerList
-                            val distance =acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon2-lon1))*6371
-                            println("Distance obtained: ${distance}")
-                            gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude} \n Distance obtained: ${distance}"
+                            val lat1rad = Math.toRadians(lat1)
+                            val lon1rad = Math.toRadians(lon1)
+                            val lat2rad = Math.toRadians(lat2)
+                            val lon2rad = Math.toRadians(lon2)
+                            val name = markerList[0].name
+                            var result: FloatArray = FloatArray(3)
+                            val distance =acos(sin(lat1rad)*sin(lat2rad)+cos(lat1rad)*cos(lat2rad)*cos(lon2rad-lon1rad))*6371
+                            Location.distanceBetween(lat1,lon1,lat2,lon2,result)
+                            println("${result[0]} ${result[1]} ${result[2]}")
+                            gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude} \n Distance obtained to marker ${name}: ${distance} \n Dist2 : ${result[0]}"
+                            //location.distanceTo()
                         }
 
                     }
