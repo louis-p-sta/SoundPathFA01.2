@@ -105,7 +105,6 @@ class WhereAmI : ComponentActivity() {
                             val lon1 = -84.37207
                             val lon2 = markerList[0].longitude
                             val lat2 = markerList[0].latitude
-                            val loc = markerList[0].location
                             val lat1rad = Math.toRadians(lat1)
                             val lon1rad = Math.toRadians(lon1)
                             val lat2rad = Math.toRadians(lat2)
@@ -115,9 +114,8 @@ class WhereAmI : ComponentActivity() {
                             val distance =acos(sin(lat1rad)*sin(lat2rad)+cos(lat1rad)*cos(lat2rad)*cos(lon2rad-lon1rad))*6371
                             Location.distanceBetween(lat1,lon1,lat2,lon2,result)
                             println("${result[0]} ${result[1]} ${result[2]}")
-                            val dist3 = location.distanceTo(loc)
-                            gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude} \n Distance obtained to marker ${name}: ${distance} \n Dist2 : ${result[0]} \n Dist3 :${dist3}"
-
+                            gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude} \n Distance obtained to marker ${name}: ${distance} \n Dist2 : ${result[0]}"
+                            //location.distanceTo()
                         }
 
                     }

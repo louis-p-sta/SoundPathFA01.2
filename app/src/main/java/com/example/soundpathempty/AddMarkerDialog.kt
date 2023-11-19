@@ -35,8 +35,7 @@ fun AddMarkerDialog(
     onEvent:(MarkerEvent) -> Unit,
     modifier: Modifier = Modifier,
     lat: Double,
-    lon: Double,
-    loc: Location
+    lon: Double
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -77,7 +76,6 @@ fun AddMarkerDialog(
                 Button(onClick = {
                     onEvent(MarkerEvent.SetLatitude(lat))
                     onEvent(MarkerEvent.SetLongitude(lon))
-                    onEvent(MarkerEvent.SetLocation(loc))
                     onEvent(MarkerEvent.SaveMarker)
                 }) {
                     Text(text = "Save")
