@@ -81,7 +81,8 @@ class Marker : ComponentActivity() {
                                 state = state,
                                 lat = wayLatitude,
                                 onEvent = viewModel::onEvent,
-                                lon = wayLongitude
+                                lon = wayLongitude,
+                                loc = location
                             )
                         }
                     }
