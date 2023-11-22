@@ -49,7 +49,8 @@ class MarkerViewModel(
                     name = name,
                     description = description,
                     latitude = latitude,
-                    longitude = longitude
+                    longitude = longitude,
+                    routeName = "MasterRoute"
                 )
                 viewModelScope.launch{
                     dao.upsertMarker(marker)

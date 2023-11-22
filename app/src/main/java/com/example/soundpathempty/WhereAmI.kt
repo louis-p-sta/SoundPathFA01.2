@@ -97,25 +97,26 @@ class WhereAmI : ComponentActivity() {
                             if(wayLatitude is Double){
                                 println("These are doubles")
                             }
-                            println("Trying to get markers")
-                            val markerList = getAllMarkers()
-                            val lat = wayLatitude
-                            val lon = wayLongitude //Test with a different position
-                            val lat1 = 33.850018
-                            val lon1 = -84.37207
-                            val lon2 = markerList[0].longitude
-                            val lat2 = markerList[0].latitude
-                            val lat1rad = Math.toRadians(lat1)
-                            val lon1rad = Math.toRadians(lon1)
-                            val lat2rad = Math.toRadians(lat2)
-                            val lon2rad = Math.toRadians(lon2)
-                            val name = markerList[0].name
-                            var result: FloatArray = FloatArray(3)
-                            val distance =acos(sin(lat1rad)*sin(lat2rad)+cos(lat1rad)*cos(lat2rad)*cos(lon2rad-lon1rad))*6371
-                            Location.distanceBetween(lat1,lon1,lat2,lon2,result)
-                            println("${result[0]} ${result[1]} ${result[2]}")
-                            gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude} \n Distance obtained to marker ${name}: ${distance} \n Dist2 : ${result[0]}"
-                            //location.distanceTo()
+//                            println("Trying to get markers")
+//                            val markerList = getAllMarkers()
+//                            val lat = wayLatitude
+//                            val lon = wayLongitude //Test with a different position
+//                            val lat1 = 33.850018
+//                            val lon1 = -84.37207
+//                            val lon2 = markerList[0].longitude
+//                            val lat2 = markerList[0].latitude
+//                            val lat1rad = Math.toRadians(lat1)
+//                            val lon1rad = Math.toRadians(lon1)
+//                            val lat2rad = Math.toRadians(lat2)
+//                            val lon2rad = Math.toRadians(lon2)
+//                            val name = markerList[0].name
+//                            var result: FloatArray = FloatArray(3)
+//                            val distance =acos(sin(lat1rad)*sin(lat2rad)+cos(lat1rad)*cos(lat2rad)*cos(lon2rad-lon1rad))*6371
+//                            Location.distanceBetween(lat1,lon1,lat2,lon2,result)
+//                            println("${result[0]} ${result[1]} ${result[2]}")
+//                            gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude} \n Distance obtained to marker ${name}: ${distance} \n Dist2 : ${result[0]}"
+                            gpslocation.text = "Current location is \n" + "Lat : ${wayLatitude}\n" + "Long : ${wayLongitude}"
+                        //location.distanceTo()
                         }
 
                     }
