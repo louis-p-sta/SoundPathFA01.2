@@ -5,8 +5,7 @@ import androidx.room.PrimaryKey
 //import androidx.room.vo.PrimaryKey
 @Entity(tableName = "markers")
 data class Marker_Data(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int? = null,
+    @PrimaryKey(autoGenerate = false)
     val name: String,
     val description: String,
     val longitude: Double,

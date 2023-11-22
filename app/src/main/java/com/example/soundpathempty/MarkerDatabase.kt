@@ -5,8 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
+import com.example.soundpathempty.Entities.Route_Data
+
 @Database(
-    entities = [Marker_Data::class],
+    entities = [Marker_Data::class,
+               Route_Data::class],
     version = 1
 )
 abstract class MarkerDatabase: RoomDatabase() {
@@ -35,7 +38,9 @@ abstract class MarkerDatabase: RoomDatabase() {
                 "Markers.db"
             )
                 //.addMigrations(MIGRATION_1_2)
-                .build()
+                .build().also{
+                    INSTANCE = it
+                }
         }
         }
     }

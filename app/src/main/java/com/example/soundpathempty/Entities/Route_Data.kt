@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 data class Route_Data(
     @PrimaryKey(autoGenerate = false)
     val routeName:String,
-    val description: String
+    val routeDescription: String
 )
