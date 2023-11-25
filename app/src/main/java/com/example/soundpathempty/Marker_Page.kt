@@ -32,65 +32,53 @@ class Marker : ComponentActivity() {
     private lateinit var locationManager: LocationManager
     private lateinit var locationListener: LocationListener
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private val db by lazy{
-        Room.databaseBuilder(applicationContext,MarkerDatabase::class.java, "Markers.db").build()
-    }
-    private val viewModel by viewModels<MarkerViewModel>(
-        factoryProducer = {
-            object: ViewModelProvider.Factory{
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return MarkerViewModel(db.dao) as T //Might need a question mark after ViewModel
-                }
-            }
-        }
-    )
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ){
-            requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-            println("Fine statement entered")
-        }
-        super.onCreate(savedInstanceState)
+//        if (ContextCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.ACCESS_FINE_LOCATION
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ){
+//            requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+//            println("Fine statement entered")
+//        }
+       super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_marker)
-        title = "Marker"
-        val loading: TextView = findViewById(R.id.loadingLocation)
-        //Immediately get GPS location
-        var wayLatitude = 0.0
-        var wayLongitude = 0.0
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        fusedLocationProviderClient.getCurrentLocation(
-            PRIORITY_HIGH_ACCURACY,
-            object : CancellationToken() {
-                override fun onCanceledRequested(p0: OnTokenCanceledListener) =
-                    CancellationTokenSource().token
-
-                override fun isCancellationRequested() = false
-            })
-            .addOnSuccessListener { location: Location? -> //This has to be null safe
-                if (location != null) {
-                    wayLatitude = location.latitude
-                    wayLongitude = location.longitude
-                    println("Acquired marker location")
-                    setContent {
-                        SoundPathEmptyTheme {
-                            val state by viewModel.state.collectAsState()
-                            MarkerScreen(
-                                state = state,
-                                lat = wayLatitude,
-                                onEvent = viewModel::onEvent,
-                                lon = wayLongitude
-                            )
-                        }
-                    }
-                }
+//        title = "Marker"
+//        val loading: TextView = findViewById(R.id.loadingLocation)
+//        //Immediately get GPS location
+//        var wayLatitude = 0.0
+//        var wayLongitude = 0.0
+//        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+//        fusedLocationProviderClient.getCurrentLocation(
+//            PRIORITY_HIGH_ACCURACY,
+//            object : CancellationToken() {
+//                override fun onCanceledRequested(p0: OnTokenCanceledListener) =
+//                    CancellationTokenSource().token
+//
+//                override fun isCancellationRequested() = false
+//            })
+//            .addOnSuccessListener { location: Location? -> //This has to be null safe
+//                if (location != null) {
+//                    wayLatitude = location.latitude
+//                    wayLongitude = location.longitude
+//                    println("Acquired marker location")
+//                    setContent {
+//                        SoundPathEmptyTheme {
+//                            val state by viewModel.state.collectAsState()
+//                            MarkerScreen(
+//                                state = state,
+//                                lat = wayLatitude,
+//                                onEvent = viewModel::onEvent,
+//                                lon = wayLongitude
+//                            )
+//                        }
+//                    }
+//                }
 
             }
-        fun getDatabase(): MarkerDatabase? {
-            return db
-        }
+//        fun getDatabase(): MarkerDatabase? {
+//            return db
+//        }
 
 //        val receiveIntent = this.getIntent()
 //        var wayLatitude = intent.getDoubleExtra("latitude",10.0)
@@ -102,8 +90,3 @@ class Marker : ComponentActivity() {
 //            startActivity(i)
 //        }
     }
-    private val requestPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            //
-        }
-}

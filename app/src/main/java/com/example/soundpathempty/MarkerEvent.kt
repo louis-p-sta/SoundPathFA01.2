@@ -8,6 +8,8 @@ sealed interface MarkerEvent{
     data class SetDescription(val description: String):MarkerEvent
     data class SetLatitude(val latitude: Double):MarkerEvent
     data class SetLongitude(val longitude: Double):MarkerEvent
+    data class SetRoute(val routeName: String): MarkerEvent
     data class DeleteMarker(val marker: Marker_Data):MarkerEvent
+    //data class ReturnHome(val conte):MarkerEvent
 
 }

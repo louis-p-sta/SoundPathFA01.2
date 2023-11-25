@@ -83,6 +83,11 @@ class MarkerViewModel(
                     name = event.name
                 )}
             }
+            is MarkerEvent.SetRoute->{
+                _state.update{it.copy(
+                    name = event.routeName
+                )}
+            }
         }
     }
 }

@@ -1,55 +1,36 @@
 package com.example.soundpathempty
 
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import android.widget.Button
+import android.Manifest
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Bundle
+import android.text.InputType
 import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import com.example.soundpathempty.databinding.LayoutBinding
 import androidx.activity.viewModels
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
+import com.example.soundpathempty.databinding.LayoutBinding
+import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
-import android.location.LocationListener
-import android.location.LocationManager
-import android.widget.TextView
-import android.Manifest
-import android.content.pm.PackageManager
-import android.content.Context
-import android.health.connect.datatypes.units.Length
-import android.util.Log
-import android.widget.ActionMenuView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.google.android.material.snackbar.Snackbar
-import android.app.Activity
-import androidx.activity.result.ActivityResultCaller
-import androidx.activity.result.registerForActivityResult
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable
+
 
 private const val PRIORITY_HIGH_ACCURACY = 100
 //Test de commit
@@ -57,7 +38,23 @@ class MainActivity : ComponentActivity() {
     private lateinit var layout: View
     private lateinit var binding: LayoutBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var m_Text = "Enter route name and description"
+    private var record_state = false
+    private var show_marker_dialog = false
+    private val db by lazy{
+        Room.databaseBuilder(applicationContext,MarkerDatabase::class.java, "Markers.db").build()
+    }
+    private val viewModel by viewModels<MarkerViewModel>(
+        factoryProducer = {
+            object: ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return MarkerViewModel(db.dao) as T //Might need a question mark after ViewModel
+                }
+            }
+        }
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
+        (viewModel::onEvent)(MarkerEvent.HideDialog)
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -133,19 +130,67 @@ class MainActivity : ComponentActivity() {
                         wayLatitude = location.latitude
                         wayLongitude = location.longitude
                         println("Acquired marker location")
-                        val markerpage = Intent(this@MainActivity, Marker::class.java)
-                        intent.putExtra("latitude", wayLatitude);
-                        intent.putExtra("longitude",wayLongitude);
-                        startActivity(markerpage)
+                        setContent {
+                           // SoundPathEmptyTheme {
+                                val state by viewModel.state.collectAsState()
+                                (viewModel::onEvent)(MarkerEvent.ShowDialog)
+                                if(state.isAddingMarker) {
+                                    AddMarkerDialog(
+                                        state = state,
+                                        onEvent = viewModel::onEvent,
+                                        lat = wayLatitude,
+                                        lon = wayLongitude,
+                                        routeName = "void"
+                                    )
+                                }
+                           // }
+                        }
                     }
                 }
+            val routesbutton: Button = findViewById(R.id.saved)
+            routesbutton.setOnClickListener {
+                val routespage = Intent(this@MainActivity, Routes::class.java)
+                startActivity(routespage)
+            }
+            val recordbutton: Button = findViewById(R.id.start)
+            recordbutton.setOnClickListener {
+                if (record_state == false) {
+                    record_state = true
+                    show_marker_dialog = true
+                } else if (record_state == true) {
+                    record_state = false
+                    show_marker_dialog = true
+                    //getLocation here
+                    /*  setContent{
+                SoundPathEmptyTheme {
+                    val state by viewModel.state.collectAsState()
+                    AddMarkerDialog(
+                        state = state,
+                        onEvent = ,
+                        lat = ,
+                        lon = ,
+                        routeName = routeName)
+
+                }
+            }*/
+                }
+
+//            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+//            builder.setTitle("Enter route name")
+//
+//// Set up the input
+//
+//// Set up the input
+//            val input = EditText(this)
+//// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+//// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+//            input.inputType = InputType.TYPE_CLASS_TEXT
+//            builder.setView(input)
+//            builder.show()
+//            println("input")
+            }
         }
-        val routesbutton: Button = findViewById(R.id.saved)
-        routesbutton.setOnClickListener {
-            val routespage = Intent(this@MainActivity, Routes::class.java)
-            startActivity(routespage)
-        }
-    }
+    } //End of onCreate
 
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->

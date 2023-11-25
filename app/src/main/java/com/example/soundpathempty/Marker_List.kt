@@ -1,5 +1,6 @@
 package com.example.soundpathempty
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +30,8 @@ fun MarkerScreen(
     state: MarkerState,
     onEvent: (MarkerEvent) -> Unit,
     lat : Double,
-    lon : Double
+    lon : Double,
+    context: Context
 ) {
     Scaffold(
         floatingActionButton = {
@@ -44,7 +46,7 @@ fun MarkerScreen(
         },
     ){ padding ->
         if(state.isAddingMarker) {
-            AddMarkerDialog(state = state, onEvent = onEvent, lat = lat, lon = lon)
+            AddMarkerDialog(state = state, onEvent = onEvent, lat = lat, lon = lon, routeName = "void")
         }
         LazyColumn(
             contentPadding = padding,
