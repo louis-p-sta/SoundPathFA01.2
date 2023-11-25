@@ -149,8 +149,17 @@ class MainActivity : ComponentActivity() {
                 }
             val routesbutton: Button = findViewById(R.id.saved)
             routesbutton.setOnClickListener {
-                val routespage = Intent(this@MainActivity, Routes::class.java)
-                startActivity(routespage)
+                setContent{
+                    val state by viewModel.state.collectAsState()
+                    MarkerScreen(
+                        state = state,
+                        onEvent = viewModel::onEvent,
+                        lat = wayLatitude,
+                        lon = wayLongitude,
+                    )
+                }
+                //val routespage = Intent(this@MainActivity, Routes::class.java)
+                //startActivity(routespage)
             }
             val recordbutton: Button = findViewById(R.id.start)
             recordbutton.setOnClickListener {
@@ -188,7 +197,7 @@ class MainActivity : ComponentActivity() {
 //            builder.setView(input)
 //            builder.show()
 //            println("input")
-            }
+            }//End of start button
         }
     } //End of onCreate
 

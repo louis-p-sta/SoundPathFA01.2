@@ -31,7 +31,6 @@ fun MarkerScreen(
     onEvent: (MarkerEvent) -> Unit,
     lat : Double,
     lon : Double,
-    context: Context
 ) {
     Scaffold(
         floatingActionButton = {
