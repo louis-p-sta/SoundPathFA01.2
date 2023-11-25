@@ -34,10 +34,10 @@ class Routes : ComponentActivity(){
 //            markers.forEach{dao.upsertMarker(it)}
 //            println("Did launch thing")
 //        }
-//        val menubutton: Button = findViewById(R.id.retouraumenu)
-//        menubutton.setOnClickListener {
-//            val i = Intent(this@Routes, MainActivity::class.java)
-//            startActivity(i)
-//        }
+        val menubutton: Button = findViewById(R.id.retouraumenu)
+        menubutton.setOnClickListener {
+            val i = Intent(this@Routes, MainActivity::class.java)
+            startActivity(i)
+        }
     }
 }

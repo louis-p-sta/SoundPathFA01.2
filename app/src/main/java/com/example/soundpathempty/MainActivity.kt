@@ -107,13 +107,14 @@ class MainActivity : ComponentActivity() {
         */
 //        println(R.id.location)
 //        println(findViewById(R.id.location))
-        val locationbutton: Button = findViewById(R.id.location)
-        locationbutton.setOnClickListener{
-            val locationpage = Intent(this@MainActivity, WhereAmI::class.java)
-            startActivity(locationpage)
+        val locationButton: Button = findViewById(R.id.location)
+        locationButton.setOnClickListener{
+            println("Location click")
+            val locationPage = Intent(this@MainActivity, WhereAmI::class.java)
+            startActivity(locationPage)
         }
-        val markerbutton: Button = findViewById(R.id.marker)
-        markerbutton.setOnClickListener {
+        val markerButton: Button = findViewById(R.id.marker)
+        markerButton.setOnClickListener {
             var wayLatitude = 0.0
             var wayLongitude = 0.0
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -131,38 +132,46 @@ class MainActivity : ComponentActivity() {
                         wayLongitude = location.longitude
                         println("Acquired marker location")
                         setContent {
-                           // SoundPathEmptyTheme {
-                                val state by viewModel.state.collectAsState()
-                                (viewModel::onEvent)(MarkerEvent.ShowDialog)
-                                if(state.isAddingMarker) {
-                                    AddMarkerDialog(
-                                        state = state,
-                                        onEvent = viewModel::onEvent,
-                                        lat = wayLatitude,
-                                        lon = wayLongitude,
-                                        routeName = "void"
-                                    )
-                                }
-                           // }
+                            // SoundPathEmptyTheme {
+                            val state by viewModel.state.collectAsState()
+                            (viewModel::onEvent)(MarkerEvent.ShowDialog)
+                            if (state.isAddingMarker) {
+                                AddMarkerDialog(
+                                    state = state,
+                                    onEvent = viewModel::onEvent,
+                                    lat = wayLatitude,
+                                    lon = wayLongitude,
+                                    routeName = "void"
+                                )
+                            }
+                            // }
                         }
                     }
                 }
-            val routesbutton: Button = findViewById(R.id.saved)
-            routesbutton.setOnClickListener {
-                setContent{
-                    val state by viewModel.state.collectAsState()
-                    MarkerScreen(
-                        state = state,
-                        onEvent = viewModel::onEvent,
-                        lat = wayLatitude,
-                        lon = wayLongitude,
-                    )
-                }
-                //val routespage = Intent(this@MainActivity, Routes::class.java)
-                //startActivity(routespage)
+        }
+            val routesButton: Button = findViewById(R.id.saved)
+            routesButton.setOnClickListener {
+                println("We've been clicked")
+//                setContent{
+//                    val state by viewModel.state.collectAsState()
+//                    MarkerScreen(
+//                        state = state,
+//                        onEvent = viewModel::onEvent,
+//                        lat = wayLatitude,
+//                        lon = wayLongitude,
+//                    )
+//                }
+                val routesPage = Intent(this@MainActivity, Routes::class.java)
+                startActivity(routesPage)
             }
-            val recordbutton: Button = findViewById(R.id.start)
-            recordbutton.setOnClickListener {
+            val settingsButton:Button = findViewById(R.id.settings)
+            settingsButton.setOnClickListener{
+                println("We've been clicked - settings")
+                val routes = Intent(this@MainActivity,WhereAmI::class.java)
+                startActivity(routes)
+            }
+            val recordButton: Button = findViewById(R.id.start)
+            recordButton.setOnClickListener {
                 if (record_state == false) {
                     record_state = true
                     show_marker_dialog = true
@@ -198,7 +207,6 @@ class MainActivity : ComponentActivity() {
 //            builder.show()
 //            println("input")
             }//End of start button
-        }
     } //End of onCreate
 
     private val requestPermission =
