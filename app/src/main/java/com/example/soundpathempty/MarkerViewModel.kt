@@ -42,6 +42,7 @@ class MarkerViewModel(
                 val description = _state.value.description
                 val latitude = _state.value.latitude
                 val longitude = _state.value.longitude
+                val routeName = _state.value.routeName
 //                if(name.isBlank() || description.isBlank()){
 //                    return
 //                }
@@ -50,7 +51,7 @@ class MarkerViewModel(
                     description = description,
                     latitude = latitude,
                     longitude = longitude,
-                    routeName = "MasterRoute"
+                    routeName = routeName
                 )
                 viewModelScope.launch{
                     dao.upsertMarker(marker)
@@ -60,7 +61,8 @@ class MarkerViewModel(
                     name = "",
                     description = "",
                     latitude = 0.0,
-                    longitude = 0.0
+                    longitude = 0.0,
+                    routeName = ""
                 ) }
             }
             is MarkerEvent.SetDescription -> {
@@ -85,7 +87,7 @@ class MarkerViewModel(
             }
             is MarkerEvent.SetRoute->{
                 _state.update{it.copy(
-                    name = event.routeName
+                    routeName = event.routeName
                 )}
             }
         }

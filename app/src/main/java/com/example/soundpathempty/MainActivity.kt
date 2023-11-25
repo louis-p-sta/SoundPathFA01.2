@@ -152,17 +152,17 @@ class MainActivity : ComponentActivity() {
             val routesButton: Button = findViewById(R.id.saved)
             routesButton.setOnClickListener {
                 println("We've been clicked")
-//                setContent{
-//                    val state by viewModel.state.collectAsState()
-//                    MarkerScreen(
-//                        state = state,
-//                        onEvent = viewModel::onEvent,
-//                        lat = wayLatitude,
-//                        lon = wayLongitude,
-//                    )
-//                }
-                val routesPage = Intent(this@MainActivity, Routes::class.java)
-                startActivity(routesPage)
+                setContent{
+                    val state by viewModel.state.collectAsState()
+                    MarkerScreen(
+                        state = state,
+                        onEvent = viewModel::onEvent,
+                        lat = 1.3,
+                        lon = 5.6
+                    )
+                }
+                //val routesPage = Intent(this@MainActivity, Routes::class.java)
+                //startActivity(routesPage)
             }
             val settingsButton:Button = findViewById(R.id.settings)
             settingsButton.setOnClickListener{
