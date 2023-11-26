@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.example.soundpathempty.Route_stuff.RoutesViewModel
 import com.example.soundpathempty.databinding.LayoutBinding
@@ -25,6 +26,8 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
+import kotlinx.coroutines.launch
+
 //import com.example.soundpathempty.Route_stuff
 
 
@@ -61,6 +64,7 @@ class MainActivity : ComponentActivity() {
         var record_state = false
         var current_route = "void"
         var last_alert_state = "success"
+        var initial_marker = false
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         (markerViewModel::onEvent)(MarkerEvent.HideDialog)
@@ -78,45 +82,38 @@ class MainActivity : ComponentActivity() {
         layout = binding.mainLayout
         setContentView(view)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-//        if (ContextCompat.checkSelfPermission(
-//                this,
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-//            println("Fine 2 statement entered")
-//        }
-        //var button = findViewById<Button>(R.id.button)
-        /*
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        )
-            requestPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        )
-            requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        finish(); */
-        //startActivity(getIntent())
+        if(initial_marker){
+            fusedLocationProviderClient.getCurrentLocation(
+                PRIORITY_HIGH_ACCURACY,
+                object : CancellationToken() {
+                    override fun onCanceledRequested(p0: OnTokenCanceledListener) =
+                        CancellationTokenSource().token
 
-        //val test: TextView = findViewById(R.id.PermissionCheck)
-        /*
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-            test.text = "DENIED"
-        } else
-            test.text = "SUCCESS"
-        val routesbutton: Button = findViewById(R.id.routes)
-        routesbutton.setOnClickListener {
-            val intent = Intent(this@MainActivity, Routes::class.java)
-            startActivity(intent)
+                    override fun isCancellationRequested() = false
+                })
+                .addOnSuccessListener { location: Location? ->
+                    //record_state = true
+                show_marker_dialog = true
+                setContent {
+                    val statemarker by markerViewModel.state.collectAsState()
+                    (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
+                    if (statemarker.isAddingMarker) {
+                        if (location != null) {
+                            AddMarkerDialog(
+                                state = statemarker,
+                                onEvent = markerViewModel::onEvent,
+                                lat = location.latitude,
+                                lon = location.longitude,
+                                routeName = current_route,
+                                title = "Place initial marker",
+                                stateChange = true
+                            )
+                        }
+                    }
+                }
+                initial_marker = false
+                }
         }
-        */
-//        println(R.id.location)
-//        println(findViewById(R.id.location))
         val locationButton: Button = findViewById(R.id.location)
         locationButton.setOnClickListener{
             println("Location click")
@@ -198,40 +195,23 @@ class MainActivity : ComponentActivity() {
                         CancellationTokenSource().token
 
                     override fun isCancellationRequested() = false
-                })
+                }) //TODO:Remove unecessary location fetch.
                 .addOnSuccessListener { location: Location? ->
                     if (record_state == false) {
                         //record_state = true
                         show_marker_dialog = true
-                        setContent {
-                            val statemarker by markerViewModel.state.collectAsState()
-                            (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
-                            if (statemarker.isAddingMarker) {
-                                if(location!=null) {
-                                    AddMarkerDialog(
-                                        state = statemarker,
-                                        onEvent = markerViewModel::onEvent,
-                                        lat = location.latitude,
-                                        lon = location.longitude,
-                                        routeName = current_route,
-                                        title = "Place initial marker",
-                                        stateChange = true
+                        lifecycleScope.launch {
+                            setContent {
+                                val state by routeViewModel.state.collectAsState()
+                                (routeViewModel::onEvent)(RouteEvent.ShowRouteDialog)
+                                if (state.isAddingRoute) {
+                                    AddRouteDialog(
+                                        state = state,
+                                        onEvent = routeViewModel::onEvent,
+                                        initialize = true
                                     )
                                 }
                             }
-                            // SoundPathEmptyTheme {
-                            val state by routeViewModel.state.collectAsState()
-                            (routeViewModel::onEvent)(RouteEvent.ShowRouteDialog)
-                            if (state.isAddingRoute) {
-                                AddRouteDialog(
-                                    state = state,
-                                    onEvent = routeViewModel::onEvent
-                                ).also {
-
-                                }
-                            }
-
-                            // }
                         }
                     } else if (record_state == true) {
                         //record_state = false

@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.soundpathempty.MainActivity.Companion.current_route
-import com.example.soundpathempty.MainActivity.Companion.initial_marker
 import com.google.android.gms.location.FusedLocationProviderClient
 import androidx.compose.foundation.layout.Box as Box1
 
@@ -29,7 +28,7 @@ private const val PRIORITY_HIGH_ACCURACY = 100
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
-fun AddRouteDialog(
+fun MiniRouteDialog(
     state:RouteState,
     onEvent:(RouteEvent) -> Unit,
     initialize: Boolean = false
@@ -49,7 +48,7 @@ fun AddRouteDialog(
                 TextField(
                     value = state.routeName,
                     onValueChange = {
-                        onEvent(RouteEvent.SetRouteName(it))
+                        //onEvent(RouteEvent.SetRouteName(it))
                         current_route = it
                     },
                     placeholder = {
@@ -85,7 +84,7 @@ fun AddRouteDialog(
                 Button(onClick = {
                     onEvent(RouteEvent.SaveRoute)
                     if(initialize){
-                        initial_marker = true
+
                     }
                     val main = Intent(context, MainActivity::class.java)
                     context.startActivity(main)

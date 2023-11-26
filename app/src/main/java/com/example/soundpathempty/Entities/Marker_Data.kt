@@ -10,7 +10,7 @@ data class Marker_Data(
     val description: String,
     val longitude: Double,
     val latitude: Double,
-    val routeName:String
+    val routeName:String,
 )
 //Entité pour updater les marqueurs
 /*@Entity
