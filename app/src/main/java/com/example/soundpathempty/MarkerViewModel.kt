@@ -23,11 +23,12 @@ class MarkerViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MarkerState())
     fun onEvent(event: MarkerEvent){
         when(event){
-            MarkerEvent.HideDialog -> {
+            is MarkerEvent.HideDialog -> {
                 _state.update {it.copy(
                     isAddingMarker = false
                 ) }
-            }MarkerEvent.ShowDialog -> {
+            }
+            is MarkerEvent.ShowDialog -> {
             _state.update { it.copy(
                 isAddingMarker = true
             ) }
@@ -37,7 +38,7 @@ class MarkerViewModel(
                 dao.deleteMarker(event.marker)
                 }
             }
-            MarkerEvent.SaveMarker -> {
+            is MarkerEvent.SaveMarker -> {
                 val name = _state.value.name
                 val description = _state.value.description
                 val latitude = _state.value.latitude

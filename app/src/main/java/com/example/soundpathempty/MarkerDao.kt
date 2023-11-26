@@ -15,8 +15,12 @@ interface MarkerDao {
     suspend fun upsertMarker(marker:Marker_Data)
     @Delete
     suspend fun deleteMarker(marker: Marker_Data)
+    @Delete
+    suspend fun deleteRoute(marker: Route_Data)
     @Query("SELECT * FROM markers ORDER BY name ASC")
     fun getAll(): Flow<List<Marker_Data>>
+    @Query("SELECT * FROM routes ORDER BY routeName ASC")
+    fun getAllRoutesDisplay(): Flow<List<Route_Data>>
     @Query("SELECT * FROM markers ORDER BY name ASC")
     fun getMarkers(): List<Marker_Data>
     @Upsert

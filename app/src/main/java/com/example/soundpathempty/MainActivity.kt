@@ -2,34 +2,30 @@ package com.example.soundpathempty
 
 
 import android.Manifest
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.text.InputType
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
+import com.example.soundpathempty.Route_stuff.RoutesViewModel
 import com.example.soundpathempty.databinding.LayoutBinding
-import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
+//import com.example.soundpathempty.Route_stuff
 
 
 private const val PRIORITY_HIGH_ACCURACY = 100
@@ -44,7 +40,7 @@ class MainActivity : ComponentActivity() {
     private val db by lazy{
         Room.databaseBuilder(applicationContext,MarkerDatabase::class.java, "Markers.db").build()
     }
-    private val viewModel by viewModels<MarkerViewModel>(
+    private val markerViewModel by viewModels<MarkerViewModel>(
         factoryProducer = {
             object: ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -53,8 +49,17 @@ class MainActivity : ComponentActivity() {
             }
         }
     )
+    private val routeViewModel by viewModels<RoutesViewModel>(
+        factoryProducer = {
+            object: ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return RoutesViewModel(db.dao) as T //Might need a question mark after ViewModel
+                }
+            }
+        }
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
-        (viewModel::onEvent)(MarkerEvent.HideDialog)
+        (markerViewModel::onEvent)(MarkerEvent.HideDialog)
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -133,12 +138,12 @@ class MainActivity : ComponentActivity() {
                         println("Acquired marker location")
                         setContent {
                             // SoundPathEmptyTheme {
-                            val state by viewModel.state.collectAsState()
-                            (viewModel::onEvent)(MarkerEvent.ShowDialog)
+                            val state by markerViewModel.state.collectAsState()
+                            (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
                             if (state.isAddingMarker) {
                                 AddMarkerDialog(
                                     state = state,
-                                    onEvent = viewModel::onEvent,
+                                    onEvent = markerViewModel::onEvent,
                                     lat = wayLatitude,
                                     lon = wayLongitude,
                                     routeName = "void"
@@ -153,10 +158,10 @@ class MainActivity : ComponentActivity() {
             routesButton.setOnClickListener {
                 println("We've been clicked")
                 setContent{
-                    val state by viewModel.state.collectAsState()
+                    val state by markerViewModel.state.collectAsState()
                     MarkerScreen(
                         state = state,
-                        onEvent = viewModel::onEvent,
+                        onEvent = markerViewModel::onEvent,
                         lat = 1.3,
                         lon = 5.6
                     )
@@ -191,6 +196,18 @@ class MainActivity : ComponentActivity() {
 
                 }
             }*/
+                }
+                setContent {
+                    // SoundPathEmptyTheme {
+                    val state by routeViewModel.state.collectAsState()
+                    (routeViewModel::onEvent)(RouteEvent.ShowRouteDialog)
+                    if (state.isAddingRoute) {
+                        AddRouteDialog(
+                            state = state,
+                            onEvent = routeViewModel::onEvent
+                        )
+                    }
+                    // }
                 }
 
 //            val builder: AlertDialog.Builder = AlertDialog.Builder(this)

@@ -1,6 +1,6 @@
 package com.example.soundpathempty
 
-import android.location.Location
+import android.content.Intent
 import android.location.LocationListener
 import android.location.LocationManager
 import androidx.compose.foundation.layout.Arrangement
@@ -14,11 +14,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.CancellationToken
-import com.google.android.gms.tasks.CancellationTokenSource
-import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.android.gms.location.FusedLocationProviderClient
 import androidx.compose.foundation.layout.Box as Box1
 
@@ -31,52 +28,59 @@ private const val PRIORITY_HIGH_ACCURACY = 100
 @Composable
 
 fun AddRouteDialog(
-    state:MarkerState,
-    onEvent:(MarkerEvent) -> Unit,
-    modifier: Modifier = Modifier,
-    lat: Double,
-    lon: Double
+    state:RouteState,
+    onEvent:(RouteEvent) -> Unit
 ) {
+    val context = LocalContext.current
     AlertDialog(
         onDismissRequest = {
-                           onEvent(MarkerEvent.HideDialog)
+            onEvent(RouteEvent.HideRouteDialog)
         },
         //confirmButton = { /*TODO*/ },
-        title = { Text(text = "Create marker") },
+        title = { Text(text = "Create route") },
         //Still need to add save button
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ){
                 TextField(
-                    value = state.name,
+                    value = state.routeName,
                     onValueChange = {
-                        onEvent(MarkerEvent.SetName(it))
+                        onEvent(RouteEvent.SetRouteName(it))
                     },
                     placeholder = {
-                        Text(text = "Name")
+                        Text(text = "Route Name")
                     }
                 )
                 TextField(
-                    value = state.description,
+                    value = state.routeDescription,
                     onValueChange = {
-                        onEvent(MarkerEvent.SetDescription(it))
+                        onEvent(RouteEvent.SetRouteDescription(it))
                     },
                     placeholder = {
-                        Text(text = "Description")
+                        Text(text = "Route Description")
                     }
                 )
             }
         },
         confirmButton = {
             Box1(
-                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(onClick = {
+                    val main = Intent(context, MainActivity::class.java)
+                    context.startActivity(main)
+                }) {
+                    Text(text = "Back")
+                }
+            }
+            Box1(
                 contentAlignment = Alignment.CenterEnd
             ) {
                 Button(onClick = {
-                    onEvent(MarkerEvent.SetLatitude(lat))
-                    onEvent(MarkerEvent.SetLongitude(lon))
-                    onEvent(MarkerEvent.SaveMarker)
+                    onEvent(RouteEvent.SaveRoute)
+                    val main = Intent(context, MainActivity::class.java)
+                    context.startActivity(main)
                 }) {
                     Text(text = "Save")
                 }

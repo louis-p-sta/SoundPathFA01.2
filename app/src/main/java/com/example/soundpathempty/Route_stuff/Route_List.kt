@@ -1,6 +1,5 @@
 package com.example.soundpathempty
 
-import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,11 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -23,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 private const val PRIORITY_HIGH_ACCURACY = 100
@@ -31,17 +27,15 @@ private const val PRIORITY_HIGH_ACCURACY = 100
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
-fun MarkerScreen(
-    state: MarkerState,
-    onEvent: (MarkerEvent) -> Unit,
-    lat : Double,
-    lon : Double
+fun RouteScreen(
+    state: RouteState,
+    onEvent: (RouteEvent) -> Unit
 ) {
     val context = LocalContext.current
     Scaffold(
     ){ padding ->
-        if(state.isAddingMarker) {
-            AddMarkerDialog(state = state, onEvent = onEvent, lat = lat, lon = lon, routeName = "void")
+        if(state.isAddingRoute) {
+            AddRouteDialog(state = state, onEvent = onEvent)
         }
         LazyColumn(
             contentPadding = padding,
@@ -49,7 +43,7 @@ fun MarkerScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ){
 
-            items(state.markers){marker ->
+            items(state.routes){route ->
                 Row(
                     modifier = Modifier.fillMaxWidth()
                 ){
@@ -57,12 +51,11 @@ fun MarkerScreen(
                         modifier = Modifier.weight(1f)
                     ){
                         Text(
-                            text = "${marker.name} \n ${marker.description}"
+                            text = "${route.routeName} \n ${route.routeDescription}"
                         )
-                        Text(text = "lat: ${marker.latitude} lon: ${marker.longitude}")
                     }
                     IconButton(onClick = {
-                        onEvent(MarkerEvent.DeleteMarker(marker))
+                        onEvent(RouteEvent.DeleteRoute(route))
                     }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -88,6 +81,7 @@ fun MarkerScreen(
                     }
                 }
             }
+
         }
 
     }
