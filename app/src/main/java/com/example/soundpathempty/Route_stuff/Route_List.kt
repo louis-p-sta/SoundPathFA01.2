@@ -1,6 +1,7 @@
 package com.example.soundpathempty
 
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.soundpathempty.MainActivity.Companion.running_route
+
 private const val PRIORITY_HIGH_ACCURACY = 100
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,9 +53,17 @@ fun RouteScreen(
                     Column(
                         modifier = Modifier.weight(1f)
                     ){
-                        Text(
-                            text = "${route.routeName} \n ${route.routeDescription}"
-                        )
+                        Box(
+                            modifier = Modifier.clickable{
+                                assign_route(route.routeName)
+                                val main = Intent(context, MainActivity::class.java)
+                                context.startActivity(main)
+                            }
+                        ){
+                            Text(
+                                text = "${route.routeName} \n ${route.routeDescription}"
+                            )
+                        }
                     }
                     IconButton(onClick = {
                         onEvent(RouteEvent.DeleteRoute(route))
@@ -85,4 +96,7 @@ fun RouteScreen(
         }
 
     }
+}
+fun assign_route(routeName:String){
+    running_route = routeName
 }

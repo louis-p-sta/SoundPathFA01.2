@@ -6,8 +6,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.example.soundpathempty.Route_stuff.RoutesViewModel
 import com.example.soundpathempty.databinding.LayoutBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -27,18 +31,21 @@ import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 //import com.example.soundpathempty.Route_stuff
 
 
 private const val PRIORITY_HIGH_ACCURACY = 100
 //Test de commit
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(),Runnable {
     private lateinit var layout: View
     private lateinit var binding: LayoutBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var m_Text = "Enter route name and description"
     private var show_marker_dialog = false
+    private var root: View? = null
+    //val handler = Handler(Looper.getMainLooper())
     private val db by lazy{
         Room.databaseBuilder(applicationContext,MarkerDatabase::class.java, "Markers.db").build()
     }
@@ -65,8 +72,12 @@ class MainActivity : ComponentActivity() {
         var current_route = "void"
         var last_alert_state = "success"
         var initial_marker = false
+        var running_route = ""
+        var current_marker_running = 0
+        var current_marker_saving = 0
     }
     override fun onCreate(savedInstanceState: Bundle?) {
+        println("Running route: ${running_route}")
         (markerViewModel::onEvent)(MarkerEvent.HideDialog)
         if (ContextCompat.checkSelfPermission(
                 this,
@@ -77,10 +88,13 @@ class MainActivity : ComponentActivity() {
             println("Fine statement entered")
         }
         super.onCreate(savedInstanceState)
+        root = findViewById(android.R.id.content)
         binding = LayoutBinding.inflate(layoutInflater)
         val view = binding.root
         layout = binding.mainLayout
         setContentView(view)
+
+        //Debut des fonctions custom
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         if(initial_marker){
             fusedLocationProviderClient.getCurrentLocation(
@@ -252,8 +266,60 @@ class MainActivity : ComponentActivity() {
 //            builder.show()
 //            println("input")
             }//End of start button
+        //handler.postDelayed(updateDistance, 2000)
     } //End of onCreate
+    public override fun onResume() {
+        super.onResume()
+        run()
+    }
 
+    public override fun onPause() {
+        root!!.removeCallbacks(this)
+        super.onPause()
+    }
+
+    override fun run() {
+//        Toast.makeText(this@PostDelayedDemo, "Who-hoo!", Toast.LENGTH_SHORT)
+//            .show()
+        runBlocking {
+            if (MainActivity.running_route != "") {
+                val data = db.dao.getRouteWithMarkers(MainActivity.running_route)
+                val routeName = data[0].route.routeName
+                val markers = data[0].markers
+                var result: FloatArray = FloatArray(3)
+                Location.distanceBetween(
+                    markers[0].latitude,
+                    markers[0].longitude,
+                    markers[1].latitude,
+                    markers[1].longitude,
+                    result
+                )
+                val distance = result[0]
+                println("Distance between ${markers[0].name} and ${markers[1].name} : ${distance}")
+            }
+        }
+        root!!.postDelayed(this, 5000)
+    }
+//    fun run(){
+//        runBlocking {
+//            if (MainActivity.running_route != "") {
+//                val data = db.dao.getRouteWithMarkers(MainActivity.running_route)
+//                val routeName = data[0].route.routeName
+//                val markers = data[0].markers
+//                var result: FloatArray = FloatArray(3)
+//                Location.distanceBetween(
+//                    markers[0].latitude,
+//                    markers[0].longitude,
+//                    markers[1].latitude,
+//                    markers[1].longitude,
+//                    result
+//                )
+//                val distance = result[0]
+//                println("Distance between ${markers[0].name} and ${markers[1].name} : ${distance}")
+//            }
+//        }
+//        view.postDelayed(this,5000)
+//    }
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         //
