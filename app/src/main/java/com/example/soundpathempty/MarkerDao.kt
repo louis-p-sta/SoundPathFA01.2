@@ -32,6 +32,8 @@ interface MarkerDao {
     @Transaction
     @Query("SELECT * FROM routes WHERE routeName = :routeName ")
     suspend fun getRouteWithMarkers(routeName: String): List<RouteWithMarkers>
+    @Query("SELECT * FROM markers WHERE routeName = :routeName")
+    suspend fun getMarkersOfRoute(routeName:String):List<Marker_Data>
 
     //Fonction pour updater les marqueurs
    // @Update(entity= Marker_Data::class)

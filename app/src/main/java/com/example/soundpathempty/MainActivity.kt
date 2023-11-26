@@ -35,7 +35,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var binding: LayoutBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var m_Text = "Enter route name and description"
-    private var record_state = false
     private var show_marker_dialog = false
     private val db by lazy{
         Room.databaseBuilder(applicationContext,MarkerDatabase::class.java, "Markers.db").build()
@@ -58,6 +57,9 @@ class MainActivity : ComponentActivity() {
             }
         }
     )
+    companion object{
+        var record_state = false
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         (markerViewModel::onEvent)(MarkerEvent.HideDialog)
         if (ContextCompat.checkSelfPermission(
@@ -168,6 +170,11 @@ class MainActivity : ComponentActivity() {
                 startActivity(routes)
             }
             val recordButton: Button = findViewById(R.id.start)
+        if (record_state == true) {
+            recordButton.setText("STOP")
+        } else if (record_state == false) {
+            recordButton.setText("RECORD")
+        }
             recordButton.setOnClickListener {
                 if (record_state == false) {
                     record_state = true
