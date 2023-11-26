@@ -8,8 +8,10 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.speech.tts.TextToSpeech
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -33,13 +35,14 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.Locale
 
 //import com.example.soundpathempty.Route_stuff
 
 
 private const val PRIORITY_HIGH_ACCURACY = 100
 //Test de commit
-class MainActivity : ComponentActivity(),Runnable {
+class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed to declare abstract class here.
     private lateinit var layout: View
     private lateinit var binding: LayoutBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -47,6 +50,8 @@ class MainActivity : ComponentActivity(),Runnable {
     private var show_marker_dialog = false
     private var root: View? = null
     //val handler = Handler(Looper.getMainLooper())
+    private var btnSpeak: Button? = null
+    private var etSpeak: EditText? = null
     private val db by lazy{
         Room.databaseBuilder(applicationContext,MarkerDatabase::class.java, "Markers.db").build()
     }
@@ -78,6 +83,8 @@ class MainActivity : ComponentActivity(),Runnable {
         var current_marker_saving = 0
         var forwards = true
         var backwards = false
+        var finished = false
+        var done = false
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         println("Running route: ${running_route}")
@@ -200,7 +207,7 @@ class MainActivity : ComponentActivity(),Runnable {
             }
             val recordButton: Button = findViewById(R.id.start)
         if (record_state == true) {
-            recordButton.setText("STOP")
+            recordButton.setText("STOP RECORD")
         } else if (record_state == false) {
             recordButton.setText("RECORD")
         }
@@ -250,26 +257,22 @@ class MainActivity : ComponentActivity(),Runnable {
                                     )
                                 }
                             }
-                            // }
                         }
                     }
                 }
-
-//            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-//            builder.setTitle("Enter route name")
-//
-//// Set up the input
-//
-//// Set up the input
-//            val input = EditText(this)
-//// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-//// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-//            input.inputType = InputType.TYPE_CLASS_TEXT
-//            builder.setView(input)
-//            builder.show()
-//            println("input")
             }//End of start button
-        //handler.postDelayed(updateDistance, 2000)
+        //Text to speech stuff
+        //val text = "Isaac is really sexy."
+        //var tts = TextToSpeech(this,this)
+//        tts = TextToSpeech(this){status->
+//            if(status == TextToSpeech.SUCCESS && tts!=null){
+//                val result = tts.setLanguage(Locale.getDefault())
+//                if(result == TextToSpeech.LANG_MISSING_DATA||result == TextToSpeech.LANG_NOT_SUPPORTED){
+//                    Toast.makeText(this,"Text to speech language not supported", Toast.LENGTH_LONG,).show()
+//                }
+//            }
+//        }
+//        tts!!.speak(text, TextToSpeech.QUEUE_FLUSH, null,"")
     } //End of onCreate
     public override fun onResume() {
         super.onResume()
@@ -302,8 +305,8 @@ class MainActivity : ComponentActivity(),Runnable {
             // for ActivityCompat#requestPermissions for more details.
             return
         }
-        val current_latitude = 0.0
-        val current_longitude = 0.0 //TODO: Clear this up (latitude longitude init)
+        var current_latitude = 0.0
+        var current_longitude = 0.0 //TODO: Clear this up (latitude longitude init)
         fusedLocationProviderClient.getCurrentLocation(
             PRIORITY_HIGH_ACCURACY,
             object : CancellationToken() {
@@ -313,32 +316,52 @@ class MainActivity : ComponentActivity(),Runnable {
             })
             .addOnSuccessListener { location: Location? ->
                 if (location!= null){
-                    val current_latitude = location.latitude
-                    val current_longitude = location.longitude
+                    current_latitude = location.latitude
+                    current_longitude = location.longitude
                 }
                 runBlocking {
                     if (running_route != "") {
+                        if(finished){
+                            done = true
+                        }
+                        val recordButton: Button = findViewById(R.id.start)
+                        recordButton.setText("STOP RECORD")
                         val data = db.dao.getRouteWithMarkers(MainActivity.running_route)
                         val routeName = data[0].route.routeName
                         val markers = data[0].markers
                         var result: FloatArray = FloatArray(3)
-                        val latitude_test = 0.0
-                        val longitude_test = 0.0
+                        //val latitude_test = 0.0
+                        //val longitude_test = 0.0
                         if(forwards == true){
                             Location.distanceBetween(
                                 current_latitude,
-                                current_latitude,
+                                current_longitude,
                                 markers[current_marker_index].latitude,
                                 markers[current_marker_index].longitude,
                                 result
                             )
                             val distance = result[0]
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance}")
-                            if(distance < 5.0){ //Notify if within 5 metres
-                                current_marker_index = current_marker_index + 1
+                            if(!done){
+                                val msg = Toast.makeText(this@MainActivity, "Distance between you and ${markers[current_marker_index].name} : ${distance}.", Toast.LENGTH_SHORT)
+                                msg.show()
                             }
-                            if(current_marker_index > markers.size){
+                            if(distance < 5.0 && current_marker_index < markers.size-1){ //Notify if within 5 metres
+                                val msg = Toast.makeText(this@MainActivity, "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index+1].name}.", Toast.LENGTH_SHORT)
+                                msg.show()
+                                current_marker_index = current_marker_index + 1
+                            }else{
+                                finished = true
+                            }
+                            if(done){
                                 println("Arrived at final destination")
+                                Toast.makeText(this@MainActivity,"Route finished!", Toast.LENGTH_LONG).show()
+                                //TODO:Fix going out of bounds exception.
+                                //TODO: Screen persistence
+                                running_route = ""
+                                current_marker_index = 0
+                                recordButton.setText("RECORD")
+
                             }
                         } else if(backwards == true){
                             Location.distanceBetween(
@@ -350,11 +373,18 @@ class MainActivity : ComponentActivity(),Runnable {
                             )
                             val distance = result[0]
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance}")
-                            if(distance < 5.0){ //Notify if within 5 metres
+                            if(distance < 5.0 && current_marker_index != 0){ //Notify if within 5 metres
+                                val msg = Toast.makeText(this@MainActivity, "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index-1].name}.", Toast.LENGTH_SHORT)
+                                msg.show()
+                                current_marker_index = current_marker_index - 1
+                            } else{
                                 current_marker_index = current_marker_index - 1
                             }
-                            if(current_marker_index == -1){
+                            if(current_marker_index == 0){
                                 println("Arrived at final destination")
+                                Toast.makeText(this@MainActivity,"Route finished!", Toast.LENGTH_SHORT)
+                                running_route = ""
+                                recordButton.setText("RECORD")
                             }
                         }
                     }
