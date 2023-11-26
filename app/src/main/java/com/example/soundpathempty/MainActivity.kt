@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -73,8 +74,10 @@ class MainActivity : ComponentActivity(),Runnable {
         var last_alert_state = "success"
         var initial_marker = false
         var running_route = ""
-        var current_marker_running = 0
+        var current_marker_index = 0
         var current_marker_saving = 0
+        var forwards = true
+        var backwards = false
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         println("Running route: ${running_route}")
@@ -281,23 +284,82 @@ class MainActivity : ComponentActivity(),Runnable {
     override fun run() {
 //        Toast.makeText(this@PostDelayedDemo, "Who-hoo!", Toast.LENGTH_SHORT)
 //            .show()
-        runBlocking {
-            if (MainActivity.running_route != "") {
-                val data = db.dao.getRouteWithMarkers(MainActivity.running_route)
-                val routeName = data[0].route.routeName
-                val markers = data[0].markers
-                var result: FloatArray = FloatArray(3)
-                Location.distanceBetween(
-                    markers[0].latitude,
-                    markers[0].longitude,
-                    markers[1].latitude,
-                    markers[1].longitude,
-                    result
-                )
-                val distance = result[0]
-                println("Distance between ${markers[0].name} and ${markers[1].name} : ${distance}")
-            }
+        //Get position
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
         }
+        val current_latitude = 0.0
+        val current_longitude = 0.0 //TODO: Clear this up (latitude longitude init)
+        fusedLocationProviderClient.getCurrentLocation(
+            PRIORITY_HIGH_ACCURACY,
+            object : CancellationToken() {
+                override fun onCanceledRequested(p0: OnTokenCanceledListener) =
+                    CancellationTokenSource().token
+                override fun isCancellationRequested() = false
+            })
+            .addOnSuccessListener { location: Location? ->
+                if (location!= null){
+                    val current_latitude = location.latitude
+                    val current_longitude = location.longitude
+                }
+                runBlocking {
+                    if (running_route != "") {
+                        val data = db.dao.getRouteWithMarkers(MainActivity.running_route)
+                        val routeName = data[0].route.routeName
+                        val markers = data[0].markers
+                        var result: FloatArray = FloatArray(3)
+                        val latitude_test = 0.0
+                        val longitude_test = 0.0
+                        if(forwards == true){
+                            Location.distanceBetween(
+                                current_latitude,
+                                current_latitude,
+                                markers[current_marker_index].latitude,
+                                markers[current_marker_index].longitude,
+                                result
+                            )
+                            val distance = result[0]
+                            println("Distance between you and ${markers[current_marker_index].name} : ${distance}")
+                            if(distance < 5.0){ //Notify if within 5 metres
+                                current_marker_index = current_marker_index + 1
+                            }
+                            if(current_marker_index > markers.size){
+                                println("Arrived at final destination")
+                            }
+                        } else if(backwards == true){
+                            Location.distanceBetween(
+                                current_latitude,
+                                current_latitude,
+                                markers[current_marker_index].latitude,
+                                markers[current_marker_index].longitude,
+                                result
+                            )
+                            val distance = result[0]
+                            println("Distance between you and ${markers[current_marker_index].name} : ${distance}")
+                            if(distance < 5.0){ //Notify if within 5 metres
+                                current_marker_index = current_marker_index - 1
+                            }
+                            if(current_marker_index == -1){
+                                println("Arrived at final destination")
+                            }
+                        }
+                    }
+                }
+            }
         root!!.postDelayed(this, 5000)
     }
 //    fun run(){
