@@ -59,6 +59,8 @@ class MainActivity : ComponentActivity() {
     )
     companion object{
         var record_state = false
+        var current_route = "void"
+        var last_alert_state = "success"
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         (markerViewModel::onEvent)(MarkerEvent.HideDialog)
@@ -75,6 +77,7 @@ class MainActivity : ComponentActivity() {
         val view = binding.root
         layout = binding.mainLayout
         setContentView(view)
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 //        if (ContextCompat.checkSelfPermission(
 //                this,
 //                Manifest.permission.ACCESS_FINE_LOCATION
@@ -124,7 +127,7 @@ class MainActivity : ComponentActivity() {
         markerButton.setOnClickListener {
             var wayLatitude = 0.0
             var wayLongitude = 0.0
-            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+            //fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationProviderClient.getCurrentLocation(
                 PRIORITY_HIGH_ACCURACY,
                 object : CancellationToken() {
@@ -142,14 +145,26 @@ class MainActivity : ComponentActivity() {
                             // SoundPathEmptyTheme {
                             val state by markerViewModel.state.collectAsState()
                             (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
-                            if (state.isAddingMarker) {
-                                AddMarkerDialog(
-                                    state = state,
-                                    onEvent = markerViewModel::onEvent,
-                                    lat = wayLatitude,
-                                    lon = wayLongitude,
-                                    routeName = "void"
-                                )
+                            if(record_state) {
+                                if (state.isAddingMarker) {
+                                    AddMarkerDialog(
+                                        state = state,
+                                        onEvent = markerViewModel::onEvent,
+                                        lat = wayLatitude,
+                                        lon = wayLongitude,
+                                        routeName = current_route
+                                    )
+                                }
+                            } else {
+                                if (state.isAddingMarker) {
+                                    AddMarkerDialog(
+                                        state = state,
+                                        onEvent = markerViewModel::onEvent,
+                                        lat = wayLatitude,
+                                        lon = wayLongitude,
+                                        routeName = "void"
+                                    )
+                                }
                             }
                             // }
                         }
@@ -176,37 +191,71 @@ class MainActivity : ComponentActivity() {
             recordButton.setText("RECORD")
         }
             recordButton.setOnClickListener {
-                if (record_state == false) {
-                    record_state = true
-                    show_marker_dialog = true
-                } else if (record_state == true) {
-                    record_state = false
-                    show_marker_dialog = true
-                    //getLocation here
-                    /*  setContent{
-                SoundPathEmptyTheme {
-                    val state by viewModel.state.collectAsState()
-                    AddMarkerDialog(
-                        state = state,
-                        onEvent = ,
-                        lat = ,
-                        lon = ,
-                        routeName = routeName)
+            fusedLocationProviderClient.getCurrentLocation(
+                PRIORITY_HIGH_ACCURACY,
+                object : CancellationToken() {
+                    override fun onCanceledRequested(p0: OnTokenCanceledListener) =
+                        CancellationTokenSource().token
 
-                }
-            }*/
-                }
-                setContent {
-                    // SoundPathEmptyTheme {
-                    val state by routeViewModel.state.collectAsState()
-                    (routeViewModel::onEvent)(RouteEvent.ShowRouteDialog)
-                    if (state.isAddingRoute) {
-                        AddRouteDialog(
-                            state = state,
-                            onEvent = routeViewModel::onEvent
-                        )
+                    override fun isCancellationRequested() = false
+                })
+                .addOnSuccessListener { location: Location? ->
+                    if (record_state == false) {
+                        //record_state = true
+                        show_marker_dialog = true
+                        setContent {
+                            val statemarker by markerViewModel.state.collectAsState()
+                            (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
+                            if (statemarker.isAddingMarker) {
+                                if(location!=null) {
+                                    AddMarkerDialog(
+                                        state = statemarker,
+                                        onEvent = markerViewModel::onEvent,
+                                        lat = location.latitude,
+                                        lon = location.longitude,
+                                        routeName = current_route,
+                                        title = "Place initial marker",
+                                        stateChange = true
+                                    )
+                                }
+                            }
+                            // SoundPathEmptyTheme {
+                            val state by routeViewModel.state.collectAsState()
+                            (routeViewModel::onEvent)(RouteEvent.ShowRouteDialog)
+                            if (state.isAddingRoute) {
+                                AddRouteDialog(
+                                    state = state,
+                                    onEvent = routeViewModel::onEvent
+                                ).also {
+
+                                }
+                            }
+
+                            // }
+                        }
+                    } else if (record_state == true) {
+                        //record_state = false
+                        show_marker_dialog = true
+                        setContent {
+                            // SoundPathEmptyTheme {
+                            val statemarker by markerViewModel.state.collectAsState()
+                            (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
+                            if (statemarker.isAddingMarker) {
+                                if(location!=null) {
+                                    AddMarkerDialog(
+                                        state = statemarker,
+                                        onEvent = markerViewModel::onEvent,
+                                        lat = location.latitude,
+                                        lon = location.longitude,
+                                        routeName = current_route,
+                                        title = "Place final marker",
+                                        stateChange = true
+                                    )
+                                }
+                            }
+                            // }
+                        }
                     }
-                    // }
                 }
 
 //            val builder: AlertDialog.Builder = AlertDialog.Builder(this)

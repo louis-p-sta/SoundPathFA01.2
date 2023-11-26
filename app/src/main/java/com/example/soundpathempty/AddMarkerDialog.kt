@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.soundpathempty.MainActivity.Companion.record_state
 import com.google.android.gms.location.FusedLocationProviderClient
 import androidx.compose.foundation.layout.Box as Box1
 
@@ -32,7 +33,9 @@ fun AddMarkerDialog(
     modifier: Modifier = Modifier,
     lat: Double,
     lon: Double,
-    routeName: String
+    routeName: String,
+    title:String = "Create marker",
+    stateChange:Boolean = false
 ) {
     val context = LocalContext.current
     AlertDialog(
@@ -40,7 +43,7 @@ fun AddMarkerDialog(
                            onEvent(MarkerEvent.HideDialog)
         },
         //confirmButton = { /*TODO*/ },
-        title = { Text(text = "Create marker") },
+        title = { Text(text = title) },
         //Still need to add save button
         text = {
             Column(
@@ -85,6 +88,9 @@ fun AddMarkerDialog(
                     onEvent(MarkerEvent.SetLongitude(lon))
                     onEvent(MarkerEvent.SetRoute(routeName))
                     onEvent(MarkerEvent.SaveMarker)
+                    if(stateChange){
+                        record_state = !record_state
+                    }
                     val main = Intent(context, MainActivity::class.java)
                     context.startActivity(main)
                 }) {
