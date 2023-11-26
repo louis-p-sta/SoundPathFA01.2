@@ -11,7 +11,9 @@
     <string name="permission_required">Location Access is required to use this App</string>
     <string name="ok">OK!</string>
     <string name="permission_granted">Permission Granted you may now use the App</string>
-    <string name = "back_to_menu">Menu</string>
-    <string name = "Load_location">Getting location...</string>
-    <string name = "Saved_items">Saved items</string>
+    <string name="back_to_menu">Menu</string>
+    <string name="Load_location">Getting location...</string>
+    <string name="Saved_items">Saved items</string>
+    <string name="Markers">Markers</string>
+    <string name="Routes">Routes</string>
 </resources>

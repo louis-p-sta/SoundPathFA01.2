@@ -47,6 +47,7 @@ fun AddRouteDialog(
                     value = state.routeName,
                     onValueChange = {
                         onEvent(RouteEvent.SetRouteName(it))
+                        val route_name = it
                     },
                     placeholder = {
                         Text(text = "Route Name")
@@ -56,6 +57,7 @@ fun AddRouteDialog(
                     value = state.routeDescription,
                     onValueChange = {
                         onEvent(RouteEvent.SetRouteDescription(it))
+                        val route_description = it
                     },
                     placeholder = {
                         Text(text = "Route Description")
