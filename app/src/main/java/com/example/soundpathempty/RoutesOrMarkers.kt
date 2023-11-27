@@ -55,7 +55,7 @@ class RoutesOrMarkers : ComponentActivity() {
                     state = state,
                     onEvent = markerViewModel::onEvent,
                     lat = 1.3,
-                    lon = 5.6
+                    lon = 5.6 //TODO: remove these stray parameters
                 )
             }
         }

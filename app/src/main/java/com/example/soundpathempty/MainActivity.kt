@@ -41,23 +41,26 @@ import java.util.Locale
 
 
 private const val PRIORITY_HIGH_ACCURACY = 100
+
 //Test de commit
-class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed to declare abstract class here.
+class MainActivity : ComponentActivity(),
+    Runnable { //TODO: Not sure if allowed to declare abstract class here.
     private lateinit var layout: View
     private lateinit var binding: LayoutBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var m_Text = "Enter route name and description"
     private var show_marker_dialog = false
     private var root: View? = null
+
     //val handler = Handler(Looper.getMainLooper())
     private var btnSpeak: Button? = null
     private var etSpeak: EditText? = null
-    private val db by lazy{
-        Room.databaseBuilder(applicationContext,MarkerDatabase::class.java, "Markers.db").build()
+    private val db by lazy {
+        Room.databaseBuilder(applicationContext, MarkerDatabase::class.java, "Markers.db").build()
     }
     private val markerViewModel by viewModels<MarkerViewModel>(
         factoryProducer = {
-            object: ViewModelProvider.Factory{
+            object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return MarkerViewModel(db.dao) as T //Might need a question mark after ViewModel
                 }
@@ -66,14 +69,15 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
     )
     private val routeViewModel by viewModels<RoutesViewModel>(
         factoryProducer = {
-            object: ViewModelProvider.Factory{
+            object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return RoutesViewModel(db.dao) as T //Might need a question mark after ViewModel
                 }
             }
         }
     )
-    companion object{
+
+    companion object {
         var record_state = false
         var current_route = "void"
         var last_alert_state = "success"
@@ -86,6 +90,7 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
         var finished = false
         var done = false
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         println("Running route: ${running_route}")
         (markerViewModel::onEvent)(MarkerEvent.HideDialog)
@@ -93,7 +98,7 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
-        ){
+        ) {
             requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             println("Fine statement entered")
         }
@@ -105,8 +110,9 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
         setContentView(view)
 
         //Debut des fonctions custom
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        if(initial_marker){
+
+        if (initial_marker) { //If pour ajouter marqueur initial lors de création de route - select initial marker function?
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationProviderClient.getCurrentLocation(
                 PRIORITY_HIGH_ACCURACY,
                 object : CancellationToken() {
@@ -117,29 +123,29 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                 })
                 .addOnSuccessListener { location: Location? ->
                     //record_state = true
-                show_marker_dialog = true
-                setContent {
-                    val statemarker by markerViewModel.state.collectAsState()
-                    (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
-                    if (statemarker.isAddingMarker) {
-                        if (location != null) {
-                            AddMarkerDialog(
-                                state = statemarker,
-                                onEvent = markerViewModel::onEvent,
-                                lat = location.latitude,
-                                lon = location.longitude,
-                                routeName = current_route,
-                                title = "Place initial marker",
-                                stateChange = true
-                            )
+                    show_marker_dialog = true
+                    setContent {
+                        val statemarker by markerViewModel.state.collectAsState()
+                        (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
+                        if (statemarker.isAddingMarker) {
+                            if (location != null) {
+                                AddMarkerDialog(
+                                    state = statemarker,
+                                    onEvent = markerViewModel::onEvent,
+                                    lat = location.latitude,
+                                    lon = location.longitude,
+                                    routeName = current_route,
+                                    title = "Place initial marker",
+                                    stateChange = true
+                                )
+                            }
                         }
                     }
-                }
-                initial_marker = false
+                    initial_marker = false
                 }
         }
         val locationButton: Button = findViewById(R.id.location)
-        locationButton.setOnClickListener{
+        locationButton.setOnClickListener {
             println("Location click")
             val locationPage = Intent(this@MainActivity, WhereAmI::class.java)
             startActivity(locationPage)
@@ -148,7 +154,8 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
         markerButton.setOnClickListener {
             var wayLatitude = 0.0
             var wayLongitude = 0.0
-            //fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+            fusedLocationProviderClient =
+                LocationServices.getFusedLocationProviderClient(this) //This used to be commented out - make sure to get the updated client before calling it to initiate second position.
             fusedLocationProviderClient.getCurrentLocation(
                 PRIORITY_HIGH_ACCURACY,
                 object : CancellationToken() {
@@ -166,7 +173,7 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                             // SoundPathEmptyTheme {
                             val state by markerViewModel.state.collectAsState()
                             (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
-                            if(record_state) {
+                            if (record_state) {
                                 if (state.isAddingMarker) {
                                     AddMarkerDialog(
                                         state = state,
@@ -192,26 +199,27 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                     }
                 }
         }
-            val routesButton: Button = findViewById(R.id.saved)
-            routesButton.setOnClickListener {
-                println("We've been clicked")
-                val selectPage = Intent(this@MainActivity, RoutesOrMarkers::class.java)
-                startActivity(selectPage)
-            }
-
-            val settingsButton:Button = findViewById(R.id.settings)
-            settingsButton.setOnClickListener{
-                println("We've been clicked - settings")
-                val routes = Intent(this@MainActivity,WhereAmI::class.java)
-                startActivity(routes)
-            }
-            val recordButton: Button = findViewById(R.id.start)
-        if (record_state == true) {
-            recordButton.setText("STOP RECORD")
-        } else if (record_state == false) {
-            recordButton.setText("RECORD")
+        val routesButton: Button = findViewById(R.id.saved)
+        routesButton.setOnClickListener {
+            println("We've been clicked")
+            val selectPage = Intent(this@MainActivity, RoutesOrMarkers::class.java)
+            startActivity(selectPage)
         }
-            recordButton.setOnClickListener {
+
+        val settingsButton: Button = findViewById(R.id.settings)
+        settingsButton.setOnClickListener {
+            println("We've been clicked - settings")
+            val routes = Intent(this@MainActivity, WhereAmI::class.java)
+            startActivity(routes)
+        }
+        val recordButton: Button = findViewById(R.id.start)
+        if (record_state == true) {
+            recordButton.text = "STOP RECORD"
+        } else if (record_state == false) {
+            recordButton.text = "RECORD"
+        }
+        recordButton.setOnClickListener {
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationProviderClient.getCurrentLocation(
                 PRIORITY_HIGH_ACCURACY,
                 object : CancellationToken() {
@@ -224,17 +232,15 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                     if (record_state == false) {
                         //record_state = true
                         show_marker_dialog = true
-                        lifecycleScope.launch {
-                            setContent {
-                                val state by routeViewModel.state.collectAsState()
-                                (routeViewModel::onEvent)(RouteEvent.ShowRouteDialog)
-                                if (state.isAddingRoute) {
-                                    AddRouteDialog(
-                                        state = state,
-                                        onEvent = routeViewModel::onEvent,
-                                        initialize = true
-                                    )
-                                }
+                        setContent { //TODO: Check if could remove lifecyclescope.launch here
+                            val state by routeViewModel.state.collectAsState()
+                            (routeViewModel::onEvent)(RouteEvent.ShowRouteDialog)
+                            if (state.isAddingRoute) {
+                                AddRouteDialog(
+                                    state = state,
+                                    onEvent = routeViewModel::onEvent,
+                                    initialize = true
+                                )
                             }
                         }
                     } else if (record_state == true) {
@@ -245,7 +251,7 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                             val statemarker by markerViewModel.state.collectAsState()
                             (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
                             if (statemarker.isAddingMarker) {
-                                if(location!=null) {
+                                if (location != null) {
                                     AddMarkerDialog(
                                         state = statemarker,
                                         onEvent = markerViewModel::onEvent,
@@ -260,7 +266,7 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                         }
                     }
                 }
-            }//End of start button
+        }//End of start button
         //Text to speech stuff
         //val text = "Isaac is really sexy."
         //var tts = TextToSpeech(this,this)
@@ -274,6 +280,7 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
 //        }
 //        tts!!.speak(text, TextToSpeech.QUEUE_FLUSH, null,"")
     } //End of onCreate
+
     public override fun onResume() {
         super.onResume()
         run()
@@ -303,36 +310,43 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(
+                this@MainActivity,
+                "Locations permissions not granted!",
+                Toast.LENGTH_LONG
+            ).show()
             return
         }
         var current_latitude = 0.0
         var current_longitude = 0.0 //TODO: Clear this up (latitude longitude init)
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)//TODO: Check that this improves location accuracy
         fusedLocationProviderClient.getCurrentLocation(
             PRIORITY_HIGH_ACCURACY,
             object : CancellationToken() {
                 override fun onCanceledRequested(p0: OnTokenCanceledListener) =
                     CancellationTokenSource().token
+
                 override fun isCancellationRequested() = false
             })
             .addOnSuccessListener { location: Location? ->
-                if (location!= null){
+                if (location != null) {
                     current_latitude = location.latitude
                     current_longitude = location.longitude
                 }
                 runBlocking {
                     if (running_route != "") {
-                        if(finished){
+                        if (finished) {
                             done = false
                         }
                         val recordButton: Button = findViewById(R.id.start)
-                        recordButton.setText("STOP RECORD")
-                        val data = db.dao.getRouteWithMarkers(MainActivity.running_route)
+                        recordButton.text = "STOP RECORD"
+                        val data = db.dao.getRouteWithMarkers(running_route)
                         val routeName = data[0].route.routeName
                         val markers = data[0].markers
                         var result: FloatArray = FloatArray(3)
                         //val latitude_test = 0.0
                         //val longitude_test = 0.0
-                        if(forwards == true){
+                        if (forwards == true) {
                             Location.distanceBetween(
                                 current_latitude,
                                 current_longitude,
@@ -342,28 +356,40 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                             )
                             val distance = result[0]
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance}")
-                            if(!done){
-                                val msg = Toast.makeText(this@MainActivity, "Distance between you and ${markers[current_marker_index].name} : ${distance}.", Toast.LENGTH_SHORT)
+                            if (!done) {
+                                val msg = Toast.makeText(
+                                    this@MainActivity,
+                                    "Distance between you and ${markers[current_marker_index].name} : ${distance}.",
+                                    Toast.LENGTH_SHORT
+                                )
                                 msg.show()
                             }
-                            if(distance < 15.0 && current_marker_index < markers.size-1){ //Notify if within 5 metres
-                                val msg = Toast.makeText(this@MainActivity, "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index+1].name}.", Toast.LENGTH_SHORT)
+                            if (distance < 15.0 && current_marker_index < markers.size - 1) { //Notify if within 5 metres
+                                val msg = Toast.makeText(
+                                    this@MainActivity,
+                                    "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index + 1].name}.",
+                                    Toast.LENGTH_SHORT
+                                )
                                 msg.show()
                                 current_marker_index = current_marker_index + 1
-                            }else{
+                            } else {
                                 finished = true
                             }
-                            if(done){
+                            if (done) {
                                 println("Arrived at final destination")
-                                Toast.makeText(this@MainActivity,"Route finished!", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Route finished!",
+                                    Toast.LENGTH_LONG
+                                ).show()
                                 //TODO:Fix going out of bounds exception.
                                 //TODO: Screen persistence
                                 running_route = ""
                                 current_marker_index = 0
-                                recordButton.setText("RECORD")
+                                recordButton.text = "RECORD"
 
                             }
-                        } else if(backwards == true){
+                        } else if (backwards == true) {
                             Location.distanceBetween(
                                 current_latitude,
                                 current_latitude,
@@ -373,18 +399,26 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                             )
                             val distance = result[0]
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance}")
-                            if(distance < 15.0 && current_marker_index != 0){ //Notify if within 5 metres
-                                val msg = Toast.makeText(this@MainActivity, "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index-1].name}.", Toast.LENGTH_SHORT)
+                            if (distance < 15.0 && current_marker_index != 0) { //Notify if within 5 metres
+                                val msg = Toast.makeText(
+                                    this@MainActivity,
+                                    "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index - 1].name}.",
+                                    Toast.LENGTH_SHORT
+                                )
                                 msg.show()
                                 current_marker_index = current_marker_index - 1
-                            } else{
+                            } else {
                                 current_marker_index = current_marker_index - 1
                             }
-                            if(current_marker_index == 0){
+                            if (current_marker_index == 0) {
                                 println("Arrived at final destination")
-                                Toast.makeText(this@MainActivity,"Route finished!", Toast.LENGTH_SHORT)
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Route finished!",
+                                    Toast.LENGTH_SHORT
+                                )
                                 running_route = ""
-                                recordButton.setText("RECORD")
+                                recordButton.text = "RECORD"
                             }
                         }
                     }
@@ -392,7 +426,8 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
             }
         root!!.postDelayed(this, 5000)
     }
-//    fun run(){
+
+    //    fun run(){
 //        runBlocking {
 //            if (MainActivity.running_route != "") {
 //                val data = db.dao.getRouteWithMarkers(MainActivity.running_route)
@@ -414,7 +449,7 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
 //    }
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        //
+            //
         }
 //    val googletest = isGooglePlayServicesAvailable(this)
 //    if g
