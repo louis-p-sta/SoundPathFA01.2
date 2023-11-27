@@ -2,13 +2,14 @@ package com.example.soundpathempty
 
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.speech.tts.TextToSpeech
+import android.speech.tts.TextToSpeech.OnInitListener
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -23,9 +24,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.example.soundpathempty.Route_stuff.RoutesViewModel
 import com.example.soundpathempty.databinding.LayoutBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -33,9 +32,9 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.Locale
+
 
 //import com.example.soundpathempty.Route_stuff
 
@@ -43,8 +42,7 @@ import java.util.Locale
 private const val PRIORITY_HIGH_ACCURACY = 100
 
 //Test de commit
-class MainActivity : ComponentActivity(),
-    Runnable { //TODO: Not sure if allowed to declare abstract class here.
+class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed to declare abstract class here.
     private lateinit var layout: View
     private lateinit var binding: LayoutBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -90,7 +88,14 @@ class MainActivity : ComponentActivity(),
         var finished = false
         var done = false
     }
-
+    private val textToSpeechEngine: TextToSpeech by lazy {
+        TextToSpeech(this,
+            TextToSpeech.OnInitListener { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    textToSpeechEngine.language = Locale.US
+                }
+            })
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         println("Running route: ${running_route}")
         (markerViewModel::onEvent)(MarkerEvent.HideDialog)
@@ -152,8 +157,8 @@ class MainActivity : ComponentActivity(),
         }
         val markerButton: Button = findViewById(R.id.marker)
         markerButton.setOnClickListener {
-            var wayLatitude = 0.0
-            var wayLongitude = 0.0
+            var wayLatitude:Double = 0.0
+            var wayLongitude:Double = 0.0
             fusedLocationProviderClient =
                 LocationServices.getFusedLocationProviderClient(this) //This used to be commented out - make sure to get the updated client before calling it to initiate second position.
             fusedLocationProviderClient.getCurrentLocation(
@@ -292,8 +297,6 @@ class MainActivity : ComponentActivity(),
     }
 
     override fun run() {
-//        Toast.makeText(this@PostDelayedDemo, "Who-hoo!", Toast.LENGTH_SHORT)
-//            .show()
         //Get position
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -317,8 +320,8 @@ class MainActivity : ComponentActivity(),
             ).show()
             return
         }
-        var current_latitude = 0.0
-        var current_longitude = 0.0 //TODO: Clear this up (latitude longitude init)
+        var current_latitude: Double = 0.0
+        var current_longitude:Double = 0.0 //TODO: Clear this up (latitude longitude init)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)//TODO: Check that this improves location accuracy
         fusedLocationProviderClient.getCurrentLocation(
             PRIORITY_HIGH_ACCURACY,
@@ -336,7 +339,7 @@ class MainActivity : ComponentActivity(),
                 runBlocking {
                     if (running_route != "") {
                         if (finished) {
-                            done = false
+                            done = true
                         }
                         val recordButton: Button = findViewById(R.id.start)
                         recordButton.text = "STOP RECORD"
@@ -356,21 +359,25 @@ class MainActivity : ComponentActivity(),
                             )
                             val distance = result[0]
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance}")
+                            val text = "Distance between you and ${markers[current_marker_index].name} : ${distance}."
                             if (!done) {
                                 val msg = Toast.makeText(
                                     this@MainActivity,
-                                    "Distance between you and ${markers[current_marker_index].name} : ${distance}.",
+                                    text,
                                     Toast.LENGTH_SHORT
                                 )
                                 msg.show()
+                                textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)
                             }
-                            if (distance < 15.0 && current_marker_index < markers.size - 1) { //Notify if within 5 metres
+                            if (distance < 5.0 && current_marker_index < markers.size - 1) { //Notify if within 5 metres
+                                val text = "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index + 1].name}."
                                 val msg = Toast.makeText(
                                     this@MainActivity,
-                                    "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index + 1].name}.",
+                                    text,
                                     Toast.LENGTH_SHORT
                                 )
                                 msg.show()
+                                textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)
                                 current_marker_index = current_marker_index + 1
                             } else {
                                 finished = true
@@ -382,6 +389,7 @@ class MainActivity : ComponentActivity(),
                                     "Route finished!",
                                     Toast.LENGTH_LONG
                                 ).show()
+                                textToSpeechEngine.speak("Route finished",TextToSpeech.QUEUE_FLUSH, null)
                                 //TODO:Fix going out of bounds exception.
                                 //TODO: Screen persistence
                                 running_route = ""
@@ -399,7 +407,7 @@ class MainActivity : ComponentActivity(),
                             )
                             val distance = result[0]
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance}")
-                            if (distance < 15.0 && current_marker_index != 0) { //Notify if within 5 metres
+                            if (distance < 5.0 && current_marker_index != 0) { //Notify if within 5 metres
                                 val msg = Toast.makeText(
                                     this@MainActivity,
                                     "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index - 1].name}.",
