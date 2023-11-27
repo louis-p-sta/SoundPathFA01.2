@@ -367,7 +367,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                     Toast.LENGTH_SHORT
                                 )
                                 msg.show()
-                                textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)
+                                //textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)
                             }
                             if (distance < 5.0 && current_marker_index < markers.size - 1) { //Notify if within 5 metres
                                 val text = "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index + 1].name}."
