@@ -322,7 +322,7 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                 runBlocking {
                     if (running_route != "") {
                         if(finished){
-                            done = true
+                            done = false
                         }
                         val recordButton: Button = findViewById(R.id.start)
                         recordButton.setText("STOP RECORD")
@@ -346,7 +346,7 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                                 val msg = Toast.makeText(this@MainActivity, "Distance between you and ${markers[current_marker_index].name} : ${distance}.", Toast.LENGTH_SHORT)
                                 msg.show()
                             }
-                            if(distance < 5.0 && current_marker_index < markers.size-1){ //Notify if within 5 metres
+                            if(distance < 15.0 && current_marker_index < markers.size-1){ //Notify if within 5 metres
                                 val msg = Toast.makeText(this@MainActivity, "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index+1].name}.", Toast.LENGTH_SHORT)
                                 msg.show()
                                 current_marker_index = current_marker_index + 1
@@ -373,7 +373,7 @@ class MainActivity : ComponentActivity(), Runnable{ //TODO: Not sure if allowed 
                             )
                             val distance = result[0]
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance}")
-                            if(distance < 5.0 && current_marker_index != 0){ //Notify if within 5 metres
+                            if(distance < 15.0 && current_marker_index != 0){ //Notify if within 5 metres
                                 val msg = Toast.makeText(this@MainActivity, "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index-1].name}.", Toast.LENGTH_SHORT)
                                 msg.show()
                                 current_marker_index = current_marker_index - 1
