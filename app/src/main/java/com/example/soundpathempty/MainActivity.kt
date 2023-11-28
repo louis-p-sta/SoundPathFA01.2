@@ -43,6 +43,7 @@ import java.util.Locale
 
 private const val PRIORITY_HIGH_ACCURACY = 100
 private const val threshold = 15
+private const val TIMEOUT:Long = 1000
 
 //Test de commit
 class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed to declare abstract class here.
@@ -463,7 +464,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     }
                 }
             }
-        root!!.postDelayed(this, 5000)
+        root!!.postDelayed(this, TIMEOUT)
     }
 
     //    fun run(){
