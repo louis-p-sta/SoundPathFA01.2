@@ -33,6 +33,8 @@ import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
 import kotlinx.coroutines.runBlocking
+import java.lang.Math.ceil
+import java.lang.Math.toIntExact
 import java.util.Locale
 
 
@@ -340,9 +342,11 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                 runBlocking {
                     var current_latitude:Double = 0.0
                     var current_longitude:Double = 0.0
+                    var accuracy: Float = 0.0f
                     if (location != null) {
                         current_latitude = location.latitude
                         current_longitude = location.longitude
+                        accuracy = location.accuracy
                     } else{
                         Toast.makeText(this@MainActivity,"Null location!", Toast.LENGTH_LONG).show()
                     }
@@ -366,10 +370,10 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 markers[current_marker_index].longitude,
                                 result
                             )
-                            val distance = result[0]
-                            val bearing = result[1]
-                            println("Distance between you and ${markers[current_marker_index].name} : ${distance}, ${bearing}")
-                            val text = "Distance between you and ${markers[current_marker_index].name} : ${distance}, ${bearing}."
+                            val distance = result[0].toInt()
+                            val bearing = result[1].toInt()
+                            println("Distance between you and ${markers[current_marker_index].name} : ${distance}, ${bearing} , accuracry(%): ${accuracy} ")
+                            val text = "Distance between you and ${markers[current_marker_index].name} : ${distance}, ${bearing}, accuracry(%): ${accuracy}."
                             if (!done) {
                                 val msg = Toast.makeText(
                                     this@MainActivity,
@@ -415,8 +419,8 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 markers[current_marker_index].longitude,
                                 result
                             )
-                            val distance = result[0]
-                            val bearing = result[1] //Par rapport au nord
+                            val distance = result[0].toInt()
+                            val bearing = result[1].toInt() //Par rapport au nord
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance} , ${bearing}")
                             val text = "Distance between you and ${markers[current_marker_index].name} : ${distance}, ${bearing}."
                             if (!done) {
