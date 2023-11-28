@@ -9,26 +9,26 @@
     tools:context=".RoutesOrMarkers">
     <!--Routes-->
     <Button
-        android:id="@+id/Routes"
+        android:id="@+id/ButtonForwards"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="20"
         android:backgroundTint="#000000"
-        android:text="@string/Routes"
+        android:text="@string/Forwards"
         android:textColor="#FFFFFF"
-        android:textSize="90sp"
+        android:textSize="70sp"
         android:textStyle="bold"
         android:visibility="visible" />
     <!--Markers-->
     <Button
-        android:id="@+id/Markers"
+        android:id="@+id/ButtonBackwards"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="20"
         android:backgroundTint="#000000"
-        android:text="@string/Markers"
+        android:text="@string/Backwards"
         android:textColor="#FFFFFF"
-        android:textSize="80sp"
+        android:textSize="60sp"
         android:textStyle="bold" />
 
     <Button

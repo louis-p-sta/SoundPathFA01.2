@@ -55,9 +55,9 @@ fun RouteScreen(
                     ){
                         Box(
                             modifier = Modifier.clickable{
-                                assign_route(route.routeName)
-                                val main = Intent(context, MainActivity::class.java)
-                                context.startActivity(main)
+                                running_route = route.routeName
+                                val direction = Intent(context, Forwards_or_backwards::class.java)
+                                context.startActivity(direction)
                             }
                         ){
                             Text(
@@ -96,7 +96,4 @@ fun RouteScreen(
         }
 
     }
-}
-fun assign_route(routeName:String){
-    running_route = routeName
 }

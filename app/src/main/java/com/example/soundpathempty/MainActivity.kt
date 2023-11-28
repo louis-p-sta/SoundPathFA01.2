@@ -234,7 +234,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     override fun isCancellationRequested() = false
                 }) //TODO:Remove unecessary location fetch.
                 .addOnSuccessListener { location: Location? ->
-                    if (record_state == false) {
+                    if (record_state == false && running_route == "") {
                         //record_state = true
                         show_marker_dialog = true
                         setContent { //TODO: Check if could remove lifecyclescope.launch here
@@ -248,7 +248,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 )
                             }
                         }
-                    } else if (record_state == true) {
+                    } else if (record_state == true && running_route == "") {
                         //record_state = false
                         show_marker_dialog = true
                         setContent {
@@ -269,6 +269,12 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 }
                             }
                         }
+                    } else if(running_route != ""){
+                        running_route = ""
+                        Toast.makeText(this@MainActivity,
+                            "Route terminated",
+                            Toast.LENGTH_LONG).show()
+                        recordButton.text = "RECORD"
                     }
                 }
         }//End of start button
@@ -320,33 +326,36 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
             ).show()
             return
         }
-        var current_latitude: Double = 0.0
-        var current_longitude:Double = 0.0 //TODO: Clear this up (latitude longitude init)
+        //var current_latitude: Double = 0.0
+        //var current_longitude:Double = 0.0 //TODO: Clear this up (latitude longitude init)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)//TODO: Check that this improves location accuracy
         fusedLocationProviderClient.getCurrentLocation(
             PRIORITY_HIGH_ACCURACY,
             object : CancellationToken() {
                 override fun onCanceledRequested(p0: OnTokenCanceledListener) =
                     CancellationTokenSource().token
-
                 override fun isCancellationRequested() = false
             })
             .addOnSuccessListener { location: Location? ->
-                if (location != null) {
-                    current_latitude = location.latitude
-                    current_longitude = location.longitude
-                }
                 runBlocking {
+                    var current_latitude:Double = 0.0
+                    var current_longitude:Double = 0.0
+                    if (location != null) {
+                        current_latitude = location.latitude
+                        current_longitude = location.longitude
+                    } else{
+                        Toast.makeText(this@MainActivity,"Null location!", Toast.LENGTH_LONG).show()
+                    }
                     if (running_route != "") {
                         if (finished) {
                             done = true
                         }
                         val recordButton: Button = findViewById(R.id.start)
-                        recordButton.text = "STOP RECORD"
+                        recordButton.text = "STOP   "
                         val data = db.dao.getRouteWithMarkers(running_route)
-                        val routeName = data[0].route.routeName
+                        //val routeName = data[0].route.routeName
                         val markers = data[0].markers
-                        var result: FloatArray = FloatArray(3)
+                        val result: FloatArray = FloatArray(3)
                         //val latitude_test = 0.0
                         //val longitude_test = 0.0
                         if (forwards == true) {
@@ -358,8 +367,9 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 result
                             )
                             val distance = result[0]
-                            println("Distance between you and ${markers[current_marker_index].name} : ${distance}")
-                            val text = "Distance between you and ${markers[current_marker_index].name} : ${distance}."
+                            val bearing = result[1]
+                            println("Distance between you and ${markers[current_marker_index].name} : ${distance}, ${bearing}")
+                            val text = "Distance between you and ${markers[current_marker_index].name} : ${distance}, ${bearing}."
                             if (!done) {
                                 val msg = Toast.makeText(
                                     this@MainActivity,
@@ -380,9 +390,9 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)
                                 current_marker_index = current_marker_index + 1
                             } else {
-                                finished = true
+                                finished = false //TODO: Debug finish
                             }
-                            if (done) {
+                            if (done == true) {
                                 println("Arrived at final destination")
                                 Toast.makeText(
                                     this@MainActivity,
@@ -406,7 +416,18 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 result
                             )
                             val distance = result[0]
-                            println("Distance between you and ${markers[current_marker_index].name} : ${distance}")
+                            val bearing = result[1] //Par rapport au nord
+                            println("Distance between you and ${markers[current_marker_index].name} : ${distance} , ${bearing}")
+                            val text = "Distance between you and ${markers[current_marker_index].name} : ${distance}, ${bearing}."
+                            if (!done) {
+                                val msg = Toast.makeText(
+                                    this@MainActivity,
+                                    text,
+                                    Toast.LENGTH_SHORT
+                                )
+                                msg.show()
+                                //textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)
+                            }
                             if (distance < 5.0 && current_marker_index != 0) { //Notify if within 5 metres
                                 val msg = Toast.makeText(
                                     this@MainActivity,

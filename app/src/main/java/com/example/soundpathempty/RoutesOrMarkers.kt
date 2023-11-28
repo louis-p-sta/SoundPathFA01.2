@@ -59,5 +59,10 @@ class RoutesOrMarkers : ComponentActivity() {
                 )
             }
         }
+        val backButton: Button = findViewById(R.id.Back)
+        backButton.setOnClickListener{
+            val main = Intent(this@RoutesOrMarkers, MainActivity::class.java)
+            startActivity(main)
+        }
     }
 }

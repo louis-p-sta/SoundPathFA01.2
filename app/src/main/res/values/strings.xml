@@ -16,4 +16,8 @@
     <string name="Saved_items">Saved items</string>
     <string name="Markers">Markers</string>
     <string name="Routes">Routes</string>
+    <string name="Back">Back</string>
+    <string name="Forwards">Run forwards</string>
+    <string name="Backwards">Run backwards</string>
+
 </resources>
