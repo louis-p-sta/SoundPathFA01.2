@@ -42,6 +42,7 @@ import java.util.Locale
 
 
 private const val PRIORITY_HIGH_ACCURACY = 100
+private const val threshold = 15
 
 //Test de commit
 class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed to declare abstract class here.
@@ -51,6 +52,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
     private var m_Text = "Enter route name and description"
     private var show_marker_dialog = false
     private var root: View? = null
+    //private val threshold = 15
 
     //val handler = Handler(Looper.getMainLooper())
     private var btnSpeak: Button? = null
@@ -222,6 +224,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         val recordButton: Button = findViewById(R.id.start)
         if (record_state == true) {
             recordButton.text = "STOP RECORD"
+            recordButton.setTextSize(65.0f)
         } else if (record_state == false) {
             recordButton.text = "RECORD"
         }
@@ -273,6 +276,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         }
                     } else if(running_route != ""){
                         running_route = ""
+                        current_marker_index = 0
                         Toast.makeText(this@MainActivity,
                             "Route terminated",
                             Toast.LENGTH_LONG).show()
@@ -343,10 +347,12 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     var current_latitude:Double = 0.0
                     var current_longitude:Double = 0.0
                     var accuracy: Float = 0.0f
+                    var intAccuracy:Int = 0
                     if (location != null) {
                         current_latitude = location.latitude
                         current_longitude = location.longitude
                         accuracy = location.accuracy
+                        intAccuracy = accuracy.toInt()
                     } else{
                         Toast.makeText(this@MainActivity,"Null location!", Toast.LENGTH_LONG).show()
                     }
@@ -355,7 +361,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                             done = true
                         }
                         val recordButton: Button = findViewById(R.id.start)
-                        recordButton.text = "STOP   "
+                        recordButton.text = "STOP"
                         val data = db.dao.getRouteWithMarkers(running_route)
                         //val routeName = data[0].route.routeName
                         val markers = data[0].markers
@@ -383,7 +389,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 msg.show()
                                 //textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)
                             }
-                            if (distance < 5.0 && current_marker_index < markers.size - 1) { //Notify if within 5 metres
+                            if (distance < threshold && current_marker_index < markers.size - 1) { //Notify if within 5 metres
                                 val text = "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index + 1].name}."
                                 val msg = Toast.makeText(
                                     this@MainActivity,
@@ -432,7 +438,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 msg.show()
                                 //textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)
                             }
-                            if (distance < 5.0 && current_marker_index != 0) { //Notify if within 5 metres
+                            if(distance < threshold && current_marker_index != 0) { //Notify if within 5 metres
                                 val msg = Toast.makeText(
                                     this@MainActivity,
                                     "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index - 1].name}.",
@@ -441,7 +447,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 msg.show()
                                 current_marker_index = current_marker_index - 1
                             } else {
-                                current_marker_index = current_marker_index - 1
+                                finished = false //TODO: This used to be current_marker decrement
                             }
                             if (current_marker_index == 0) {
                                 println("Arrived at final destination")
