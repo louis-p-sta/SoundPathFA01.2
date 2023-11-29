@@ -434,15 +434,15 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                             val distance = result[0]
                             val distance_int = result[0].toInt()
                             val bearing = result[1].toInt()
-                            val distance_ten:Int = ((Math.ceil(distance/10.0))*10).toInt()
-                            if((distance_ten % 100) == 0 ){
+                            //val distance_ten:Int = ((Math.ceil(distance/10.0))*10).toInt()
+                            if((distance_int % 100) < 10 ){
                                 reminder = true
                             }
-                            if((distance_ten % 50)==0 && distance_ten<100){
+                            if((distance_int % 50)<5 && distance_int<100){
                                 reminder = true
                             }
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance_int}, ${bearing} , accuracy(%): ${accuracy} ")
-                            val text = "Distance to ${markers[current_marker_index].name} is  ${distance_ten} meters ${convertClockPosition(current_direction,result[1])}."
+                            val text = "Distance to ${markers[current_marker_index].name} is  ${distance_int} meters ${convertClockPosition(current_direction,result[1])}."
                             if (!done) {
                                 val msg = Toast.makeText(
                                     this@MainActivity,
@@ -453,7 +453,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 if(reminder) {
                                     textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
                                     reminder = false
-                                    Toast.makeText(this@MainActivity,"Distance reminder in effect (${distance_ten}) meters, ${markers[current_marker_index].name}.",Toast.LENGTH_SHORT)
+                                    Toast.makeText(this@MainActivity,"Distance reminder in effect (${distance_int}) meters, ${markers[current_marker_index].name}.",Toast.LENGTH_SHORT)
                                 }
                             }
                             if (distance < threshold && current_marker_index < markers.size - 1) { //Notify if within 5 metres
