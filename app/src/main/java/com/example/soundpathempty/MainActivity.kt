@@ -628,6 +628,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     var result = FloatArray(3)
                     var closestMarker = "None"
                     var closestDistance = 1.0e10f
+                    var closestBearing = 0.0f
                     for (marker in markers) {
                         Location.distanceBetween(
                             myLatitude,
@@ -637,9 +638,11 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                             result
                         )
                         val distance = result[0]
+                        val bearing = result[1]
                         if (distance < closestDistance) {
                             closestDistance = distance
                             closestMarker = marker.name
+                            closestBearing = bearing
                         }
                     }
                     if (closestMarker == "None") {
@@ -652,7 +655,8 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         ).show()
                     } else {
                         val text =
-                            "Nearest marker is ${closestMarker}, ${closestDistance.toInt()} meters away."
+                            "Nearest marker is ${closestMarker}, ${closestDistance.toInt()} meters ${convertClockPosition(
+                                current_direction,closestBearing)}"
                         textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
                         Toast.makeText(
                             this@MainActivity,
@@ -733,26 +737,26 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         var closestBearing = 0.0f
         var myLatitude = latitude
         var myLongitude = longitude
-            runBlocking {
-                val markers = db.dao.getMarkers()
-                var result = FloatArray(3)
-                for (marker in markers) {
-                    Location.distanceBetween(
-                        myLatitude,
-                        myLongitude,
-                        marker.latitude,
-                        marker.longitude,
-                        result
-                    )
-                    val distance = result[0]
-                    val bearing = result[1]
-                    if (distance < closestDistance && marker.routeName != running_route) {
-                        closestDistance = distance
-                        closestMarker = marker
-                        closestBearing = bearing
-                    }
+        runBlocking {
+            val markers = db.dao.getMarkers()
+            var result = FloatArray(3)
+            for (marker in markers) {
+                Location.distanceBetween(
+                    myLatitude,
+                    myLongitude,
+                    marker.latitude,
+                    marker.longitude,
+                    result
+                )
+                val distance = result[0]
+                val bearing = result[1]
+                if (distance < closestDistance && marker.routeName != running_route) {
+                    closestDistance = distance
+                    closestMarker = marker
+                    closestBearing = bearing
                 }
             }
+        }
                 //val (distance,marker) = Pair(closestDistance,closestMarker)
         return Triple(closestDistance, closestMarker, closestBearing)
     }
