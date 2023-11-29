@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -64,15 +66,16 @@ fun MarkerScreen(
             containerColor = Color.Black,
             topBar = {
                 TopAppBar(
-                    title = {Text("Marker List")},
+                    title = { Text("Marker List") },
                 )
             },
             bottomBar = {
 
-                BottomAppBar (
+                BottomAppBar(
                     containerColor = Color.Transparent
-                ){
-                    Button(onClick = { context.startActivity(main) },
+                ) {
+                    Button(
+                        onClick = { context.startActivity(main) },
                         modifier = Modifier
                             .fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.White)
@@ -85,56 +88,76 @@ fun MarkerScreen(
             }
         )
         { padding ->
-            if(state.isAddingMarker) {
-                AddMarkerDialog(state = state, onEvent = onEvent, lat = lat, lon = lon, routeName = "void")
+            if (state.isAddingMarker) {
+                AddMarkerDialog(
+                    state = state,
+                    onEvent = onEvent,
+                    lat = lat,
+                    lon = lon,
+                    routeName = "void"
+                )
             }
 
             LazyColumn(
                 contentPadding = padding,
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
-            ){
+            ) {
 
-                items(state.markers){marker ->
+                items(state.markers) { marker ->
                     Row(
+
                         modifier = Modifier
                             .fillMaxWidth()
                             .border(border = BorderStroke(1.dp, Color.White))
-                    ){
+                            .clickable {
+                                markerTrack = marker
+                                context.startActivity(main)
+                            }
+
+                    ) {
                         Column(
                             modifier = Modifier.weight(1f)
-                        ){
-                            Button(
-                                onClick = {
-                                    markerTrack = marker
-                                    context.startActivity(main)
-                                }
+                        ) {
+                            Box (
+                                modifier = Modifier.fillMaxWidth(),
                             ){
+
                                 Text(
-                                    text = "${marker.name} \n ${marker.description} \n Route : ${marker.routeName}",
+                                    text = "${marker.name}",
                                     fontSize = 30.sp, color = Color.White
                                 )
-                                Text(text = "lat: ${marker.latitude} lon: ${marker.longitude}", color=Color.White)
-                            }
-                        }
-                        IconButton(onClick = {
-                            onEvent(MarkerEvent.DeleteMarker(marker))
-                        }) {
-                            Icon(
-                                painterResource(id = R.drawable.deletebuttonwhite),
-                                contentDescription = "Delete Marker",
-                                modifier = Modifier.size(75.dp),
-                                tint = Color.White
 
+                                //Text(text = "lat: ${marker.latitude} lon: ${marker.longitude}", color=Color.White)
+
+                            }
+
+                        }
+                        Column {
+                            Text(
+                                text = " ${marker.description}",
+                                fontSize = 15.sp, color = Color.White
                             )
                         }
-                    }
+                        Column {
+                            IconButton(onClick = {
+                                onEvent(MarkerEvent.DeleteMarker(marker))
+                            }) {
+                                Icon(
+                                    painterResource(id = R.drawable.deletebuttonwhite),
+                                    contentDescription = "Delete Marker",
+                                    modifier = Modifier.size(75.dp),
+                                    tint = Color.White
+                                )
 
+                            }
+                        }
+
+                    }
                 }
+
             }
 
         }
-
     }
-
 }
