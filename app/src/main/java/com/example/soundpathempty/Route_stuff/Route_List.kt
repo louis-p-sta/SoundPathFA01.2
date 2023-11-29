@@ -86,32 +86,40 @@ fun RouteScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .border(border = BorderStroke(1.dp, Color.White))
+                            .clickable {
+                                running_route = route.routeName
+                                val direction = Intent(context, Forwards_or_backwards::class.java)
+                                context.startActivity(direction)
+                            }
                     ){
                         Column(
                             modifier = Modifier.weight(1f)
                         ){
                             Box(
-                                modifier = Modifier.clickable{
-                                    running_route = route.routeName
-                                    val direction = Intent(context, Forwards_or_backwards::class.java)
-                                    context.startActivity(direction)
-                                }
+                                modifier = Modifier.fillMaxWidth(),
                             ){
                                 Text(
-                                    text = "${route.routeName} \n ${route.routeDescription}",fontSize = 30.sp, color = Color.White
+                                    text = "${route.routeName} \n ",fontSize = 30.sp, color = Color.White
+                                )
+
+                            }
+                        }
+                        Column {
+                            Text(text = "${route.routeDescription}", fontSize = 15.sp, color= Color.White)
+                        }
+                        Column {
+                            IconButton(onClick = {
+                                onEvent(RouteEvent.DeleteRoute(route))
+                            }) {
+                                Icon(
+                                    painterResource(id = R.drawable.deletebuttonwhite),
+                                    contentDescription = "Delete ${route.routeName}",
+                                    modifier = Modifier.size(75.dp),
+                                    tint = Color.White
                                 )
                             }
                         }
-                        IconButton(onClick = {
-                            onEvent(RouteEvent.DeleteRoute(route))
-                        }) {
-                            Icon(
-                                painterResource(id = R.drawable.deletebuttonwhite),
-                                contentDescription = "Delete Marker",
-                                modifier = Modifier.size(75.dp),
-                                tint = Color.White
-                            )
-                        }
+
                     }
 
                 }
