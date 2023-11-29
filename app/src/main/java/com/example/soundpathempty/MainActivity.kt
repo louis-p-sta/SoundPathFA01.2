@@ -405,6 +405,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 if(reminder) {
                                     textToSpeechEngine.speak(text, TextToSpeech.QUEUE_FLUSH, null)
                                     reminder = false
+                                    Toast.makeText(this@MainActivity,"Distance reminder in effect (${distance_ten}) meters, ${markers[current_marker_index].name}.",Toast.LENGTH_SHORT)
                                 }
                             }
                             if (distance < threshold && current_marker_index < markers.size - 1) { //Notify if within 5 metres
