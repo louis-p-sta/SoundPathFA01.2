@@ -2,14 +2,11 @@ package com.example.soundpathempty
 
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
-import android.speech.tts.TextToSpeech.OnInitListener
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -34,8 +31,6 @@ import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
 import kotlinx.coroutines.runBlocking
-import java.lang.Math.ceil
-import java.lang.Math.toIntExact
 import java.util.Locale
 
 
@@ -80,7 +75,21 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
             }
         }
     )
-
+    private val textToSpeechEngine: TextToSpeech by lazy {
+        TextToSpeech(this,
+            TextToSpeech.OnInitListener { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    textToSpeechEngine.language = Locale.US
+                }
+            })
+    }
+//    fun setup() {
+//        if (textToSpeechEngine == null) {
+//            textToSpeechEngine = TextToSpeech(
+//                MyAppUtils.getApplicationContext()
+//            ) { status -> if (status == TextToSpeech.SUCCESS) speaker.setLanguage(Locale.getDefault()) }
+//        }
+//    }
     companion object {
         var record_state = false
         val noRouteName = "No Route"
@@ -102,14 +111,6 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         var point2: Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = noRouteName)
         var resultPoints = FloatArray(3)
         //var reminder_twentyfive = false
-    }
-    private val textToSpeechEngine: TextToSpeech by lazy {
-        TextToSpeech(this,
-            TextToSpeech.OnInitListener { status ->
-                if (status == TextToSpeech.SUCCESS) {
-                    textToSpeechEngine.language = Locale.US
-                }
-            })
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         println("Running route: ${running_route}")
@@ -318,9 +319,9 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
 
     public override fun onPause() {
         root!!.removeCallbacks(this)
+        textToSpeechEngine.stop()
         super.onPause()
     }
-
     override fun run() {
         //Get position
         if(markerTrack.name !=""){
@@ -413,6 +414,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         val text = "Nearby marker ${nearestMarker.name} is ${nearestMarkerDistance.toInt()} meters ${convertClockPosition(current_direction,nearestMarkerBearing)}"
                         Toast.makeText(this@MainActivity,text,Toast.LENGTH_SHORT)
                         textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD,null)
+                        //Flag
 
                     }
                     if (running_route != "") {
@@ -577,6 +579,11 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             //
         }
+
+    override fun onDestroy() {
+        textToSpeechEngine.shutdown()
+        super.onDestroy()
+    }
     fun nearestMarker(){
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -724,26 +731,26 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         var closestBearing = 0.0f
         var myLatitude = latitude
         var myLongitude = longitude
-                runBlocking {
-                    val markers = db.dao.getMarkers()
-                    var result = FloatArray(3)
-                    for (marker in markers) {
-                        Location.distanceBetween(
-                            myLatitude,
-                            myLongitude,
-                            marker.latitude,
-                            marker.longitude,
-                            result
-                        )
-                        val distance = result[0]
-                        val bearing = result[1]
-                        if (distance < closestDistance && marker.routeName != running_route) {
-                            closestDistance = distance
-                            closestMarker = marker
-                            closestBearing = bearing
-                        }
+            runBlocking {
+                val markers = db.dao.getMarkers()
+                var result = FloatArray(3)
+                for (marker in markers) {
+                    Location.distanceBetween(
+                        myLatitude,
+                        myLongitude,
+                        marker.latitude,
+                        marker.longitude,
+                        result
+                    )
+                    val distance = result[0]
+                    val bearing = result[1]
+                    if (distance < closestDistance && marker.routeName != running_route) {
+                        closestDistance = distance
+                        closestMarker = marker
+                        closestBearing = bearing
                     }
                 }
+            }
                 //val (distance,marker) = Pair(closestDistance,closestMarker)
         return Triple(closestDistance, closestMarker, closestBearing)
     }
