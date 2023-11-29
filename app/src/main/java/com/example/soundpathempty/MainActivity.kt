@@ -161,9 +161,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         }
         val locationButton: Button = findViewById(R.id.location)
         locationButton.setOnClickListener {
-            println("Location click")
-            val locationPage = Intent(this@MainActivity, WhereAmI::class.java)
-            startActivity(locationPage)
+            nearestMarker()
         }
         val markerButton: Button = findViewById(R.id.marker)
         markerButton.setOnClickListener {
@@ -513,6 +511,115 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             //
         }
+    fun nearestMarker(){
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(
+                this@MainActivity,
+                "Locations permissions not granted!",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)//TODO: Check that this improves location accuracy
+        fusedLocationProviderClient.getCurrentLocation(
+            PRIORITY_HIGH_ACCURACY,
+            object : CancellationToken() {
+                override fun onCanceledRequested(p0: OnTokenCanceledListener) =
+                    CancellationTokenSource().token
+                override fun isCancellationRequested() = false
+            })
+            .addOnSuccessListener { location: Location? ->
+                var myLatitude = 0.0
+                var myLongitude = 0.0
+                if (location != null) {
+                    myLatitude = location.latitude
+                    myLongitude = location.longitude
+                }
+                val markers = db.dao.getMarkers()
+                var result = FloatArray(3)
+                var closestMarker = "None"
+                var closestDistance = 1.0e10f
+                for (marker in markers) {
+                    Location.distanceBetween(myLatitude, myLongitude,marker.latitude, marker.longitude, result)
+                    val distance = result[0]
+                    if (distance < closestDistance){
+                        closestDistance = distance
+                        closestMarker = marker.name
+                    }
+                }
+                if(closestMarker == "None"){
+                    textToSpeechEngine.speak("No nearby markers.", TextToSpeech.QUEUE_FLUSH, null)
+                }else{
+                    textToSpeechEngine.speak("Nearest marker is ${closestMarker}, ${closestDistance.toInt()} meters away.", TextToSpeech.QUEUE_FLUSH, null)
+                }
+            }
+    }
+    fun nearestMarkerNotInRouteDistance():Pair<Float,String>{
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(
+                this@MainActivity,
+                "Locations permissions not granted!",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        var closestMarker = "None"
+        var closestDistance = 1.0e10f
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)//TODO: Check that this improves location accuracy
+        fusedLocationProviderClient.getCurrentLocation(
+            PRIORITY_HIGH_ACCURACY,
+            object : CancellationToken() {
+                override fun onCanceledRequested(p0: OnTokenCanceledListener) =
+                    CancellationTokenSource().token
+                override fun isCancellationRequested() = false
+            })
+            .addOnSuccessListener { location: Location? ->
+                var myLatitude = 0.0
+                var myLongitude = 0.0
+                if (location != null) {
+                    myLatitude = location.latitude
+                    myLongitude = location.longitude
+                }
+                val markers = db.dao.getMarkers()
+                var result = FloatArray(3)
+                for (marker in markers) {
+                    Location.distanceBetween(myLatitude, myLongitude,marker.latitude, marker.longitude, result)
+                    val distance = result[0]
+                    if (distance < closestDistance && marker.routeName != running_route){
+                        closestDistance = distance
+                        closestMarker = marker.name
+                    }
+                }
+            }
+        //val (distance,marker) = Pair(closestDistance,closestMarker)
+        return Pair(closestDistance,closestMarker)
+    }
 //    val googletest = isGooglePlayServicesAvailable(this)
 //    if g
 }
