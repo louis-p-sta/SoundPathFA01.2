@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.example.soundpathempty.Route_stuff.RoutesViewModel
 import com.example.soundpathempty.databinding.LayoutBinding
+import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationToken
@@ -82,7 +83,8 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
 
     companion object {
         var record_state = false
-        var current_route = "void"
+        val noRouteName = "No Route"
+        var current_route = noRouteName
         var last_alert_state = "success"
         var initial_marker = false
         var running_route = ""
@@ -200,7 +202,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                         onEvent = markerViewModel::onEvent,
                                         lat = wayLatitude,
                                         lon = wayLongitude,
-                                        routeName = "void"
+                                        routeName = noRouteName
                                     )
                                 }
                             }
@@ -401,7 +403,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)
                                 current_marker_index = current_marker_index + 1
                             } else {
-                                finished = false //TODO: Debug finish
+                                finished = true //TODO: Debug finish
                             }
                             if (done == true) {
                                 println("Arrived at final destination")
@@ -416,6 +418,8 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 running_route = ""
                                 current_marker_index = 0
                                 recordButton.text = "RECORD"
+                                done = false
+                                finished = false
 
                             }
                         } else if (backwards == true) {
@@ -448,7 +452,8 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 msg.show()
                                 current_marker_index = current_marker_index - 1
                             } else {
-                                finished = false //TODO: This used to be current_marker decrement
+                                finished = true //TODO: This used to be current_marker decrement
+                                finished = true //TODO: This used to be current_marker decrement
                             }
                             if (current_marker_index == 0) {
                                 println("Arrived at final destination")
