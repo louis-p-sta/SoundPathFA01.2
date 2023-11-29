@@ -137,21 +137,24 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     //record_state = true
                     show_marker_dialog = true
                     setContent {
-                        val statemarker by markerViewModel.state.collectAsState()
-                        (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
-                        if (statemarker.isAddingMarker) {
-                            if (location != null) {
-                                AddMarkerDialog(
-                                    state = statemarker,
-                                    onEvent = markerViewModel::onEvent,
-                                    lat = location.latitude,
-                                    lon = location.longitude,
-                                    routeName = current_route,
-                                    title = "Place initial marker",
-                                    stateChange = true
-                                )
+                        SoundPathEmptyTheme {
+                            val statemarker by markerViewModel.state.collectAsState()
+                            (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
+                            if (statemarker.isAddingMarker) {
+                                if (location != null) {
+                                    AddMarkerDialog(
+                                        state = statemarker,
+                                        onEvent = markerViewModel::onEvent,
+                                        lat = location.latitude,
+                                        lon = location.longitude,
+                                        routeName = current_route,
+                                        title = "Place initial marker",
+                                        stateChange = true
+                                    )
+                                }
                             }
                         }
+
                     }
                     initial_marker = false
                 }
@@ -182,7 +185,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         wayLongitude = location.longitude
                         println("Acquired marker location")
                         setContent {
-                            // SoundPathEmptyTheme {
+                            SoundPathEmptyTheme {
                             val state by markerViewModel.state.collectAsState()
                             (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
                             if (record_state) {
@@ -206,7 +209,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                     )
                                 }
                             }
-                            // }
+                            }
                         }
                     }
                 }
@@ -260,20 +263,21 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         //record_state = false
                         show_marker_dialog = true
                         setContent {
-                            // SoundPathEmptyTheme {
-                            val statemarker by markerViewModel.state.collectAsState()
-                            (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
-                            if (statemarker.isAddingMarker) {
-                                if (location != null) {
-                                    AddMarkerDialog(
-                                        state = statemarker,
-                                        onEvent = markerViewModel::onEvent,
-                                        lat = location.latitude,
-                                        lon = location.longitude,
-                                        routeName = current_route,
-                                        title = "Place final marker",
-                                        stateChange = true
-                                    )
+                            SoundPathEmptyTheme {
+                                val statemarker by markerViewModel.state.collectAsState()
+                                (markerViewModel::onEvent)(MarkerEvent.ShowDialog)
+                                if (statemarker.isAddingMarker) {
+                                    if (location != null) {
+                                        AddMarkerDialog(
+                                            state = statemarker,
+                                            onEvent = markerViewModel::onEvent,
+                                            lat = location.latitude,
+                                            lon = location.longitude,
+                                            routeName = current_route,
+                                            title = "Place final marker",
+                                            stateChange = true
+                                        )
+                                    }
                                 }
                             }
                         }
