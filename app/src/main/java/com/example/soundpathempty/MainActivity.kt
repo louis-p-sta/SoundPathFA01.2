@@ -96,10 +96,10 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         var done = false
         var routeStarted = false
         var reminder = false
-        var markerTrack:Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = "")
+        var markerTrack:Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = noRouteName)
         var current_direction = 0.0f
-        var point1:Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = "")
-        var point2: Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = "")
+        var point1:Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = noRouteName)
+        var point2: Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = noRouteName)
         var resultPoints = FloatArray(3)
         //var reminder_twentyfive = false
     }
@@ -407,6 +407,14 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     if(resultPoints[0]>5) {
                         current_direction = resultPoints[1]
                     }
+                    //Check for nearby markers
+                    var (nearestMarkerDistance,nearestMarker,nearestMarkerBearing) = nearestMarkerNoLocation(current_latitude,current_longitude)
+                    if(nearestMarkerDistance<15 && nearestMarker.routeName!=running_route){
+                        val text = "Nearby marker ${nearestMarker.name} is ${nearestMarkerDistance.toInt()} meters ${convertClockPosition(current_direction,nearestMarkerBearing)}"
+                        Toast.makeText(this@MainActivity,text,Toast.LENGTH_SHORT)
+                        textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD,null)
+
+                    }
                     if (running_route != "") {
                         if(routeStarted){
                             textToSpeechEngine.speak("${running_route} started.", TextToSpeech.QUEUE_ADD, null)
@@ -466,7 +474,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                     markers[current_marker_index + 1].longitude,
                                     resultnext
                                 )
-                                val text = "Arrived at marker ${markers[current_marker_index].name}. Marker comment : ${markers[current_marker_index].description}. Next marker ${markers[current_marker_index + 1].name} is ${resultnext[0].toInt()} meters away."
+                                val text = "Arrived at marker ${markers[current_marker_index].name}. Marker comment : ${markers[current_marker_index].description}. Next marker ${markers[current_marker_index + 1].name} is ${resultnext[0].toInt()} meters ${convertClockPosition(current_direction,resultnext[1])}."
                                 val msg = Toast.makeText(
                                     this@MainActivity,
                                     text,
@@ -482,10 +490,10 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 println("Arrived at final destination")
                                 Toast.makeText(
                                     this@MainActivity,
-                                    "Route finished!",
+                                    "Arrived at ${markers[current_marker_index].name}. Route finished!",
                                     Toast.LENGTH_LONG
                                 ).show()
-                                textToSpeechEngine.speak("Route finished",TextToSpeech.QUEUE_ADD, null)
+                                textToSpeechEngine.speak("Arrived at ${markers[current_marker_index].name}. Route finished!",TextToSpeech.QUEUE_ADD, null)
                                 //TODO:Fix going out of bounds exception.
                                 //TODO: Screen persistence
                                 running_route = ""
@@ -708,6 +716,35 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                 }
                 //val (distance,marker) = Pair(closestDistance,closestMarker)
             }
+        return Triple(closestDistance, closestMarker, closestBearing)
+    }
+    fun nearestMarkerNoLocation(latitude:Double,longitude:Double):Triple<Float,Marker_Data,Float>{
+        var closestMarker = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = "")
+        var closestDistance = 1.0e10f
+        var closestBearing = 0.0f
+        var myLatitude = latitude
+        var myLongitude = longitude
+                runBlocking {
+                    val markers = db.dao.getMarkers()
+                    var result = FloatArray(3)
+                    for (marker in markers) {
+                        Location.distanceBetween(
+                            myLatitude,
+                            myLongitude,
+                            marker.latitude,
+                            marker.longitude,
+                            result
+                        )
+                        val distance = result[0]
+                        val bearing = result[1]
+                        if (distance < closestDistance && marker.routeName != running_route) {
+                            closestDistance = distance
+                            closestMarker = marker
+                            closestBearing = bearing
+                        }
+                    }
+                }
+                //val (distance,marker) = Pair(closestDistance,closestMarker)
         return Triple(closestDistance, closestMarker, closestBearing)
     }
     fun getLocation():Location?{
