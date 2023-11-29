@@ -111,6 +111,8 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         var point2: Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = noRouteName)
         var resultPoints = FloatArray(3)
         var nearby_marker = "None"
+        var backwardsinitindex = false
+        var forwardsinitindex = false
         //var reminder_twentyfive = false
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -325,17 +327,6 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
     }
     override fun run() {
         //Get position
-        if(markerTrack.name !=""){
-            val current_location = getLocation()
-            var result = FloatArray(3)
-            if(current_location != null){
-                Location.distanceBetween(current_location.latitude,current_location.longitude,markerTrack.latitude,markerTrack.longitude,result)
-            }
-            val text = "Distance to ${markerTrack.name} is ${result[0].toInt()} meters ${convertClockPosition(current_direction,result[1])}."
-            Toast.makeText(this@MainActivity,text,Toast.LENGTH_LONG).show()
-            textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)//TODO: Make sure queue ADD is the correct thing
-            markerTrack.name = "" //TODO: Double check queue flush
-        }
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -381,6 +372,15 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         intAccuracy = accuracy.toInt()
                     } else{
                         Toast.makeText(this@MainActivity,"Null location!", Toast.LENGTH_LONG).show()
+                    }
+                    //Marker check track
+                    if(markerTrack.name !=""){
+                        var result = FloatArray(3)
+                        Location.distanceBetween(current_latitude,current_longitude,markerTrack.latitude,markerTrack.longitude,result)
+                        val text = "Distance to ${markerTrack.name} is ${result[0].toInt()} meters ${convertClockPosition(current_direction,result[1])}."
+                        Toast.makeText(this@MainActivity,text,Toast.LENGTH_LONG).show()
+                        textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)//TODO: Make sure queue ADD is the correct thing
+                        markerTrack.name = "" //TODO: Double check queue flush
                     }
                     //Update tracking vector
                     if(point1.latitude == 0.0){
@@ -433,6 +433,13 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         //val routeName = data[0].route.routeName
                         val markers = data[0].markers
                         val result: FloatArray = FloatArray(3)
+                        if(forwardsinitindex){
+                            current_marker_index = 0
+                            forwardsinitindex = false
+                        }else if(backwardsinitindex){
+                            current_marker_index = markers.size -1
+                            backwardsinitindex = false
+                        }
                         //val latitude_test = 0.0
                         //val longitude_test = 0.0
                         if (forwards == true) {
