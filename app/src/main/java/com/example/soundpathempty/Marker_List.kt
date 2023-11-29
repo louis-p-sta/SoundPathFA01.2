@@ -145,7 +145,7 @@ fun MarkerScreen(
                             }) {
                                 Icon(
                                     painterResource(id = R.drawable.deletebuttonwhite),
-                                    contentDescription = "Delete Marker",
+                                    contentDescription = "Delete ${marker.name}",
                                     modifier = Modifier.size(75.dp),
                                     tint = Color.White
                                 )

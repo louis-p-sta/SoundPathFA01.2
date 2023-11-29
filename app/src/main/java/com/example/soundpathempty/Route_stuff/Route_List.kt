@@ -113,7 +113,7 @@ fun RouteScreen(
                             }) {
                                 Icon(
                                     painterResource(id = R.drawable.deletebuttonwhite),
-                                    contentDescription = "Delete Marker",
+                                    contentDescription = "Delete ${route.routeName}",
                                     modifier = Modifier.size(75.dp),
                                     tint = Color.White
                                 )
