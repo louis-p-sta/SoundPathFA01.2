@@ -62,6 +62,8 @@ fun MarkerScreen(
                         Box(
                             modifier = Modifier.clickable{
                                 markerTrack = marker
+                                val intent = Intent(context, MainActivity::class.java)
+                                context.startActivity(intent)
                             }
                         ){
                             Text(
@@ -69,6 +71,7 @@ fun MarkerScreen(
                             )
                             Text(text = "lat: ${marker.latitude} lon: ${marker.longitude}")
                         }
+
                     }
                     IconButton(onClick = {
                         onEvent(MarkerEvent.DeleteMarker(marker))

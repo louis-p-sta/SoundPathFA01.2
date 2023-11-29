@@ -160,17 +160,6 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     initial_marker = false
                 }
         }
-        if(markerTrack.name !=""){
-            val current_location = getLocation()
-            var result = FloatArray(3)
-            if(current_location != null){
-                Location.distanceBetween(current_location.latitude,current_location.longitude,markerTrack.latitude,markerTrack.longitude,result)
-            }
-            val text = "Distance to ${markerTrack.name} is ${result[0].toInt()} meters.)"
-            Toast.makeText(this@MainActivity,text,Toast.LENGTH_LONG)
-            textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)//TODO: Make sure queue ADD is the correct thing
-            markerTrack.name = ""
-        }
         val locationButton: Button = findViewById(R.id.location)
         locationButton.setOnClickListener {
             nearestMarker()
@@ -326,6 +315,17 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
 
     override fun run() {
         //Get position
+        if(markerTrack.name !=""){
+            val current_location = getLocation()
+            var result = FloatArray(3)
+            if(current_location != null){
+                Location.distanceBetween(current_location.latitude,current_location.longitude,markerTrack.latitude,markerTrack.longitude,result)
+            }
+            val text = "Distance to ${markerTrack.name} is ${result[0].toInt()} meters.)"
+            Toast.makeText(this@MainActivity,text,Toast.LENGTH_LONG)
+            textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)//TODO: Make sure queue ADD is the correct thing
+            markerTrack.name = ""
+        }
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
