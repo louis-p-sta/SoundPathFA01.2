@@ -6,11 +6,11 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "markers")
 data class Marker_Data(
     @PrimaryKey(autoGenerate = false)
-    val name: String,
-    val description: String,
-    val longitude: Double,
-    val latitude: Double,
-    val routeName:String,
+    var name: String,
+    var description: String,
+    var longitude: Double,
+    var latitude: Double,
+    var routeName:String,//TODO:Check that mutable types are ok here.
 )
 //Entité pour updater les marqueurs
 /*@Entity

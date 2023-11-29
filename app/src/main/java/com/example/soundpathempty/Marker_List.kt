@@ -2,6 +2,7 @@ package com.example.soundpathempty
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.soundpathempty.MainActivity.Companion.markerTrack
+
 private const val PRIORITY_HIGH_ACCURACY = 100
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,10 +59,16 @@ fun MarkerScreen(
                     Column(
                         modifier = Modifier.weight(1f)
                     ){
-                        Text(
-                            text = "${marker.name} \n ${marker.description} \n Route : ${marker.routeName}"
-                        )
-                        Text(text = "lat: ${marker.latitude} lon: ${marker.longitude}")
+                        Box(
+                            modifier = Modifier.clickable{
+                                markerTrack = marker
+                            }
+                        ){
+                            Text(
+                                text = "${marker.name} \n ${marker.description} \n Route : ${marker.routeName}"
+                            )
+                            Text(text = "lat: ${marker.latitude} lon: ${marker.longitude}")
+                        }
                     }
                     IconButton(onClick = {
                         onEvent(MarkerEvent.DeleteMarker(marker))
