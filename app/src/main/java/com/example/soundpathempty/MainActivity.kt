@@ -325,8 +325,8 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
             if(current_location != null){
                 Location.distanceBetween(current_location.latitude,current_location.longitude,markerTrack.latitude,markerTrack.longitude,result)
             }
-            val text = "Distance to ${markerTrack.name} is ${result[0].toInt()} meters.)"
-            Toast.makeText(this@MainActivity,text,Toast.LENGTH_LONG)
+            val text = "Distance to ${markerTrack.name} is ${result[0].toInt()} meters."
+            Toast.makeText(this@MainActivity,text,Toast.LENGTH_LONG).show()
             textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)//TODO: Make sure queue ADD is the correct thing
             markerTrack.name = ""
         }
@@ -444,7 +444,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 msg.show()
                                 textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)
                                 current_marker_index = current_marker_index + 1
-                            } else if(current_marker_index == markers.size){
+                            } else if(current_marker_index == markers.size - 1){
                                 finished = true
                             }
                             if (done == true) {

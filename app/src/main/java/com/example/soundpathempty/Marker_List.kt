@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.soundpathempty.MainActivity.Companion.markerTrack
 import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
 
 private const val PRIORITY_HIGH_ACCURACY = 100
@@ -103,11 +104,18 @@ fun MarkerScreen(
                         Column(
                             modifier = Modifier.weight(1f)
                         ){
-                            Text(
-                                text = "${marker.name} \n ${marker.description} \n Route : ${marker.routeName}",
-                                fontSize = 30.sp, color = Color.White
-                            )
-                            Text(text = "lat: ${marker.latitude} lon: ${marker.longitude}", color=Color.White)
+                            Button(
+                                onClick = {
+                                    markerTrack = marker
+                                    context.startActivity(main)
+                                }
+                            ){
+                                Text(
+                                    text = "${marker.name} \n ${marker.description} \n Route : ${marker.routeName}",
+                                    fontSize = 30.sp, color = Color.White
+                                )
+                                Text(text = "lat: ${marker.latitude} lon: ${marker.longitude}", color=Color.White)
+                            }
                         }
                         IconButton(onClick = {
                             onEvent(MarkerEvent.DeleteMarker(marker))
