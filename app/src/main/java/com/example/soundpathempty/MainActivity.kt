@@ -110,6 +110,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         var point1:Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = noRouteName)
         var point2: Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = noRouteName)
         var resultPoints = FloatArray(3)
+        var nearby_marker = "None"
         //var reminder_twentyfive = false
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -410,11 +411,12 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     }
                     //Check for nearby markers
                     var (nearestMarkerDistance,nearestMarker,nearestMarkerBearing) = nearestMarkerNoLocation(current_latitude,current_longitude)
-                    if(nearestMarkerDistance<15 && nearestMarker.routeName!=running_route){
+                    if(nearestMarkerDistance<15 && nearestMarker.routeName!=running_route && nearestMarker.name != nearby_marker){
                         val text = "Nearby marker ${nearestMarker.name} is ${nearestMarkerDistance.toInt()} meters ${convertClockPosition(current_direction,nearestMarkerBearing)}"
                         Toast.makeText(this@MainActivity,text,Toast.LENGTH_SHORT)
                         textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD,null)
                         //Flag
+                        nearby_marker = nearestMarker.name
 
                     }
                     if (running_route != "") {
