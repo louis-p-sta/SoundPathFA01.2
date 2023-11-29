@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/activity_routes_or_markers"
+    tools:context=".RoutesOrMarkers">
+    <!--Routes-->
+    <Button
+        android:id="@+id/ButtonForwards"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="20"
+        android:backgroundTint="#000000"
+        android:text="@string/Forwards"
+        android:textColor="#FFFFFF"
+        android:textSize="70sp"
+        android:textStyle="bold"
+        android:visibility="visible" />
+    <!--Markers-->
+    <Button
+        android:id="@+id/ButtonBackwards"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="20"
+        android:backgroundTint="#000000"
+        android:text="@string/Backwards"
+        android:textColor="#FFFFFF"
+        android:textSize="60sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/Back"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="20"
+        android:backgroundTint="#000000"
+        android:text="@string/Back"
+        android:textColor="#FFFFFF"
+        android:textSize="80sp"
+        android:textStyle="bold" />
+    <!--ROUTES-->
+    <!--LOCATION-->
+    <!--SETTINGS-->
+
+</LinearLayout>

@@ -1,45 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/main_layout"
+    tools:context=".MainActivity">
         <!--START-->
         <Button
-            android:id="@+id/button9"
+            android:id="@+id/start"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="20"
             android:backgroundTint="#000000"
-            android:text="@string/Start"
+            android:text="@string/Record"
             android:textColor="#FFFFFF"
             android:textSize="90sp"
             android:textStyle="bold"
             android:visibility="visible" />
         <!--MARKER-->
         <Button
-            android:id="@+id/button10"
+            android:id="@+id/marker"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="20"
             android:backgroundTint="#000000"
-            android:text="@string/Search"
+            android:text="@string/Marker"
             android:textColor="#FFFFFF"
             android:textSize="90sp"
             android:textStyle="bold" />
         <!--ROUTES-->
         <Button
-            android:id="@+id/button11"
+            android:id="@+id/saved"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="20"
             android:backgroundTint="#000000"
-            android:text="@string/Routes"
+            android:text="@string/Saved"
             android:textColor="#FFFFFF"
             android:textSize="90sp"
             android:textStyle="bold" />
         <!--LOCATION-->
         <Button
-            android:id="@+id/button12"
+            android:id="@+id/location"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="20"
@@ -50,7 +54,7 @@
             android:textStyle="bold" />
         <!--SETTINGS-->
         <Button
-            android:id="@+id/button13"
+            android:id="@+id/settings"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="20"
@@ -59,4 +63,5 @@
             android:textColor="#FFFFFF"
             android:textSize="75sp"
             android:textStyle="bold" />
+
 </LinearLayout>
