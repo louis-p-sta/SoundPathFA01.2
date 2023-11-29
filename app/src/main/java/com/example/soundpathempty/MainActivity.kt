@@ -39,7 +39,7 @@ import java.util.Locale
 
 private const val PRIORITY_HIGH_ACCURACY = 100
 private const val threshold = 15
-private const val TIMEOUT:Long = 5000
+private const val TIMEOUT:Long = 2000 //TODO: This used to be 5 seconds
 
 //Test de commit
 class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed to declare abstract class here.
@@ -389,7 +389,8 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     } else if (point2.latitude == 0.0){
                         point2.latitude = current_latitude
                         point2.longitude = current_longitude
-                    } else if (resultPoints[0]<5){
+                    }
+                    if (resultPoints[0]<5){
                         //Ne pas mettre a jour le premier point si trop proche.
                         point2.latitude = current_latitude
                         point2.longitude= current_longitude
@@ -420,10 +421,6 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
 
                     }
                     if (running_route != "") {
-                        if(routeStarted){
-                            textToSpeechEngine.speak("${running_route} started.", TextToSpeech.QUEUE_ADD, null)
-                            routeStarted = false
-                        }
                         if (finished) {
                             done = true
                         }
@@ -454,6 +451,12 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                             val distance_int = result[0].toInt()
                             val bearing = result[1].toInt()
                             //val distance_ten:Int = ((Math.ceil(distance/10.0))*10).toInt()
+                            if(routeStarted){
+                                val text = "${running_route} started. First marker ${markers[current_marker_index].name} is  ${distance_int} meters ${convertClockPosition(current_direction,result[1])}."
+                                textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
+                                Toast.makeText(this@MainActivity,text, Toast.LENGTH_SHORT).show()
+                                routeStarted = false
+                            }
                             if((distance_int % 100) < 10 ){
                                 reminder = true
                             }
@@ -819,4 +822,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
     }
 //    val googletest = isGooglePlayServicesAvailable(this)
 //    if g
+    fun textDisplay(){
+        //1 message per loop?
+    }
 }
