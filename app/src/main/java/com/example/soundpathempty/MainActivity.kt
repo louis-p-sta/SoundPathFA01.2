@@ -97,6 +97,10 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         var routeStarted = false
         var reminder = false
         var markerTrack:Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = "")
+        var current_direction = 0.0f
+        var point1:Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = "")
+        var point2: Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = "")
+        var resultPoints = FloatArray(3)
         //var reminder_twentyfive = false
     }
     private val textToSpeechEngine: TextToSpeech by lazy {
@@ -226,8 +230,8 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         val settingsButton: Button = findViewById(R.id.settings)
         settingsButton.setOnClickListener {
             println("We've been clicked - settings")
-            val routes = Intent(this@MainActivity, WhereAmI::class.java)
-            startActivity(routes)
+            //val routes = Intent(this@MainActivity, WhereAmI::class.java)
+            //startActivity(routes) TODO:Settings/customisation
         }
         val recordButton: Button = findViewById(R.id.start)
         if (record_state == true) {
@@ -325,10 +329,10 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
             if(current_location != null){
                 Location.distanceBetween(current_location.latitude,current_location.longitude,markerTrack.latitude,markerTrack.longitude,result)
             }
-            val text = "Distance to ${markerTrack.name} is ${result[0].toInt()} meters."
+            val text = "Distance to ${markerTrack.name} is ${result[0].toInt()} meters ${convertClockPosition(current_direction,result[1])}."
             Toast.makeText(this@MainActivity,text,Toast.LENGTH_LONG).show()
-            textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)//TODO: Make sure queue ADD is the correct thing
-            markerTrack.name = ""
+            textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)//TODO: Make sure queue ADD is the correct thing
+            markerTrack.name = "" //TODO: Double check queue flush
         }
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -376,6 +380,33 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     } else{
                         Toast.makeText(this@MainActivity,"Null location!", Toast.LENGTH_LONG).show()
                     }
+                    //Update tracking vector
+                    if(point1.latitude == 0.0){
+                        point1.latitude = current_latitude
+                        point1.longitude = current_longitude
+                    } else if (point2.latitude == 0.0){
+                        point2.latitude = current_latitude
+                        point2.longitude = current_longitude
+                    } else if (resultPoints[0]<5){
+                        //Ne pas mettre a jour le premier point si trop proche.
+                        point2.latitude = current_latitude
+                        point2.longitude= current_longitude
+                    }else if(resultPoints[0]>=5){
+                        point1 = point2
+                        point2.latitude = current_latitude
+                        point2.longitude= current_longitude
+                    }
+                    //Get current bearing
+                    Location.distanceBetween(
+                        point1.latitude,
+                        point1.longitude,
+                        point2.latitude,
+                        point2.latitude,
+                        resultPoints
+                    )
+                    if(resultPoints[0]>5) {
+                        current_direction = resultPoints[1]
+                    }
                     if (running_route != "") {
                         if(routeStarted){
                             textToSpeechEngine.speak("${running_route} started.", TextToSpeech.QUEUE_ADD, null)
@@ -411,7 +442,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 reminder = true
                             }
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance_int}, ${bearing} , accuracy(%): ${accuracy} ")
-                            val text = "Distance to ${markers[current_marker_index].name} is  ${distance_ten} meters."
+                            val text = "Distance to ${markers[current_marker_index].name} is  ${distance_ten} meters ${convertClockPosition(current_direction,result[1])}."
                             if (!done) {
                                 val msg = Toast.makeText(
                                     this@MainActivity,
@@ -615,7 +646,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                 }
             }
     }
-    fun nearestMarkerNotInRouteDistance():Pair<Float,String>{
+    fun nearestMarkerNotInRoute():Triple<Float,String,Float>{
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -639,6 +670,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         }
         var closestMarker = "None"
         var closestDistance = 1.0e10f
+        var closestBearing = 0.0f
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)//TODO: Check that this improves location accuracy
         fusedLocationProviderClient.getCurrentLocation(
             PRIORITY_HIGH_ACCURACY,
@@ -666,15 +698,17 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                             result
                         )
                         val distance = result[0]
+                        val bearing = result[1]
                         if (distance < closestDistance && marker.routeName != running_route) {
                             closestDistance = distance
                             closestMarker = marker.name
+                            closestBearing = bearing
                         }
                     }
                 }
                 //val (distance,marker) = Pair(closestDistance,closestMarker)
             }
-        return Pair(closestDistance, closestMarker)
+        return Triple(closestDistance, closestMarker, closestBearing)
     }
     fun getLocation():Location?{
         var myLoc:Location? = null
@@ -711,6 +745,20 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                 myLoc = location
             }
         return myLoc
+    }
+    fun convertClockPosition(user_bearing:Float,marker_bearing:Float):String{
+        val real_bearing = marker_bearing - user_bearing
+        var clock_position = ""
+        if(real_bearing > -45 && real_bearing <= 45){
+            clock_position = "forwards"
+        }else if (real_bearing > -45 && real_bearing <= 135){
+            clock_position = "to the right"
+        } else if((real_bearing > 135 && real_bearing < 180 )||(real_bearing<-135 && real_bearing>-180)){
+            clock_position = "backwards"
+        } else if(real_bearing<-45 && real_bearing>-135){
+            clock_position = "to the left"
+        }
+        return clock_position
     }
 //    val googletest = isGooglePlayServicesAvailable(this)
 //    if g
