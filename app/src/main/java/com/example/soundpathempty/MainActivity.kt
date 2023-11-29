@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
     private var btnSpeak: Button? = null
     private var etSpeak: EditText? = null
     private val db by lazy {
-        Room.databaseBuilder(applicationContext, MarkerDatabase::class.java, "Markers.db").build()
+        Room.databaseBuilder(applicationContext, MarkerDatabase::class.java, "Markers.db").allowMainThreadQueries().build()//TODO: Potentially harmful.
     }
     private val markerViewModel by viewModels<MarkerViewModel>(
         factoryProducer = {
@@ -542,28 +542,49 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                 override fun isCancellationRequested() = false
             })
             .addOnSuccessListener { location: Location? ->
-                var myLatitude = 0.0
-                var myLongitude = 0.0
-                if (location != null) {
-                    myLatitude = location.latitude
-                    myLongitude = location.longitude
-                }
-                val markers = db.dao.getMarkers()
-                var result = FloatArray(3)
-                var closestMarker = "None"
-                var closestDistance = 1.0e10f
-                for (marker in markers) {
-                    Location.distanceBetween(myLatitude, myLongitude,marker.latitude, marker.longitude, result)
-                    val distance = result[0]
-                    if (distance < closestDistance){
-                        closestDistance = distance
-                        closestMarker = marker.name
+                runBlocking {
+                    var myLatitude = 0.0
+                    var myLongitude = 0.0
+                    if (location != null) {
+                        myLatitude = location.latitude
+                        myLongitude = location.longitude
                     }
-                }
-                if(closestMarker == "None"){
-                    textToSpeechEngine.speak("No nearby markers.", TextToSpeech.QUEUE_FLUSH, null)
-                }else{
-                    textToSpeechEngine.speak("Nearest marker is ${closestMarker}, ${closestDistance.toInt()} meters away.", TextToSpeech.QUEUE_FLUSH, null)
+                    val markers = db.dao.getMarkers()
+                    var result = FloatArray(3)
+                    var closestMarker = "None"
+                    var closestDistance = 1.0e10f
+                    for (marker in markers) {
+                        Location.distanceBetween(
+                            myLatitude,
+                            myLongitude,
+                            marker.latitude,
+                            marker.longitude,
+                            result
+                        )
+                        val distance = result[0]
+                        if (distance < closestDistance) {
+                            closestDistance = distance
+                            closestMarker = marker.name
+                        }
+                    }
+                    if (closestMarker == "None") {
+                        val text = "No nearby markers."
+                        textToSpeechEngine.speak(text, TextToSpeech.QUEUE_FLUSH, null)
+                        Toast.makeText(
+                            this@MainActivity,
+                            text,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        val text =
+                            "Nearest marker is ${closestMarker}, ${closestDistance.toInt()} meters away."
+                        textToSpeechEngine.speak(text, TextToSpeech.QUEUE_FLUSH, null)
+                        Toast.makeText(
+                            this@MainActivity,
+                            text,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
     }
@@ -600,25 +621,33 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                 override fun isCancellationRequested() = false
             })
             .addOnSuccessListener { location: Location? ->
-                var myLatitude = 0.0
-                var myLongitude = 0.0
-                if (location != null) {
-                    myLatitude = location.latitude
-                    myLongitude = location.longitude
-                }
-                val markers = db.dao.getMarkers()
-                var result = FloatArray(3)
-                for (marker in markers) {
-                    Location.distanceBetween(myLatitude, myLongitude,marker.latitude, marker.longitude, result)
-                    val distance = result[0]
-                    if (distance < closestDistance && marker.routeName != running_route){
-                        closestDistance = distance
-                        closestMarker = marker.name
+                runBlocking {
+                    var myLatitude = 0.0
+                    var myLongitude = 0.0
+                    if (location != null) {
+                        myLatitude = location.latitude
+                        myLongitude = location.longitude
+                    }
+                    val markers = db.dao.getMarkers()
+                    var result = FloatArray(3)
+                    for (marker in markers) {
+                        Location.distanceBetween(
+                            myLatitude,
+                            myLongitude,
+                            marker.latitude,
+                            marker.longitude,
+                            result
+                        )
+                        val distance = result[0]
+                        if (distance < closestDistance && marker.routeName != running_route) {
+                            closestDistance = distance
+                            closestMarker = marker.name
+                        }
                     }
                 }
+                //val (distance,marker) = Pair(closestDistance,closestMarker)
             }
-        //val (distance,marker) = Pair(closestDistance,closestMarker)
-        return Pair(closestDistance,closestMarker)
+        return Pair(closestDistance, closestMarker)
     }
 //    val googletest = isGooglePlayServicesAvailable(this)
 //    if g
