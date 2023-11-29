@@ -12,6 +12,7 @@ import com.example.soundpathempty.MainActivity.Companion.backwards
 import com.example.soundpathempty.MainActivity.Companion.done
 import com.example.soundpathempty.MainActivity.Companion.finished
 import com.example.soundpathempty.MainActivity.Companion.forwards
+import com.example.soundpathempty.MainActivity.Companion.routeStarted
 import com.example.soundpathempty.MainActivity.Companion.running_route
 
 class Forwards_or_backwards : ComponentActivity() {
@@ -24,6 +25,7 @@ class Forwards_or_backwards : ComponentActivity() {
             backwards = false
             done = false
             finished = false
+            routeStarted = true
             val main = Intent(this@Forwards_or_backwards, MainActivity::class.java)
             startActivity(main)
         }
@@ -33,6 +35,7 @@ class Forwards_or_backwards : ComponentActivity() {
             forwards = false
             done = false
             finished = false
+            routeStarted = true
             val main = Intent(this@Forwards_or_backwards, MainActivity::class.java)
             startActivity(main)
         }

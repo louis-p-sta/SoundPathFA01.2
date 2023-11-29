@@ -94,6 +94,9 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         var backwards = false
         var finished = false
         var done = false
+        var routeStarted = false
+        var reminder = false
+        //var reminder_twentyfive = false
     }
     private val textToSpeechEngine: TextToSpeech by lazy {
         TextToSpeech(this,
@@ -360,6 +363,10 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         Toast.makeText(this@MainActivity,"Null location!", Toast.LENGTH_LONG).show()
                     }
                     if (running_route != "") {
+                        if(routeStarted){
+                            textToSpeechEngine.speak("${running_route} started.", TextToSpeech.QUEUE_FLUSH, null)
+                            routeStarted = false
+                        }
                         if (finished) {
                             done = true
                         }
@@ -381,8 +388,15 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                             )
                             val distance = result[0].toInt()
                             val bearing = result[1].toInt()
-                            println("Distance between you and ${markers[current_marker_index].name} : ${distance}, ${bearing} , accuracry(%): ${accuracy} ")
-                            val text = "Distance between you and ${markers[current_marker_index].name} : ${distance}, ${bearing}, accuracry(%): ${accuracy}."
+                            val distance_ten:Int = ((Math.ceil(distance/10.0))*10).toInt()
+                            if((distance_ten % 100) == 0 ){
+                                reminder = true
+                            }
+                            if((distance_ten % 50)==0 && distance_ten<100){
+                                reminder = true
+                            }
+                            println("Distance between you and ${markers[current_marker_index].name} : ${distance_ten}, ${bearing} , accuracy(%): ${accuracy} ")
+                            val text = "Distance to ${markers[current_marker_index].name} is  ${distance_ten} meters."
                             if (!done) {
                                 val msg = Toast.makeText(
                                     this@MainActivity,
@@ -390,10 +404,13 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                     Toast.LENGTH_SHORT
                                 )
                                 msg.show()
-                                //textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)
+                                if(reminder) {
+                                    textToSpeechEngine.speak(text, TextToSpeech.QUEUE_FLUSH, null)
+                                    reminder = false
+                                }
                             }
                             if (distance < threshold && current_marker_index < markers.size - 1) { //Notify if within 5 metres
-                                val text = "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index + 1].name}."
+                                val text = "Arrived at marker ${markers[current_marker_index].name}. Marker comment : ${markers[current_marker_index].description}. Next marker ${markers[current_marker_index + 1].name}, ${distance} meters away."
                                 val msg = Toast.makeText(
                                     this@MainActivity,
                                     text,
@@ -446,7 +463,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                             if(distance < threshold && current_marker_index != 0) { //Notify if within 5 metres
                                 val msg = Toast.makeText(
                                     this@MainActivity,
-                                    "Arrived at marker ${markers[current_marker_index].name}, next marker ${markers[current_marker_index - 1].name}.",
+                                    "Arrived at marker ${markers[current_marker_index].name}. Marker comment : ${markers[current_marker_index]}. Next marker ${markers[current_marker_index - 1].name}, ${distance} meters away.",
                                     Toast.LENGTH_SHORT
                                 )
                                 msg.show()
