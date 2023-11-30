@@ -2,6 +2,7 @@ package com.example.soundpathempty
 
 import android.content.Context
 import android.content.Intent
+import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,9 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.soundpathempty.MainActivity.Companion.markerTrack
 import com.example.soundpathempty.ui.theme.SoundPathEmptyTheme
+import java.util.Locale
 
 private const val PRIORITY_HIGH_ACCURACY = 100
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 

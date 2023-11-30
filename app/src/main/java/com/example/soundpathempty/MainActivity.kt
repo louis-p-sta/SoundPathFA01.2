@@ -50,7 +50,14 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
     private var show_marker_dialog = false
     private var root: View? = null
     //private val threshold = 15
-
+    private val textToSpeechEngine: TextToSpeech by lazy {
+        TextToSpeech(this,
+            TextToSpeech.OnInitListener { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    textToSpeechEngine.language = Locale.US
+                }
+            })
+    }
     //val handler = Handler(Looper.getMainLooper())
     private var btnSpeak: Button? = null
     private var etSpeak: EditText? = null
@@ -75,14 +82,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
             }
         }
     )
-    private val textToSpeechEngine: TextToSpeech by lazy {
-        TextToSpeech(this,
-            TextToSpeech.OnInitListener { status ->
-                if (status == TextToSpeech.SUCCESS) {
-                    textToSpeechEngine.language = Locale.US
-                }
-            })
-    }
+
 //    fun setup() {
 //        if (textToSpeechEngine == null) {
 //            textToSpeechEngine = TextToSpeech(
@@ -110,7 +110,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         var point1:Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = noRouteName)
         var point2: Marker_Data = Marker_Data(name = "", description = "", latitude = 0.0, longitude = 0.0, routeName = noRouteName)
         var resultPoints = FloatArray(3)
-        var nearby_marker = "None"
+        var nearby_marker:Array<String> = arrayOf("")
         var backwardsinitindex = false
         var forwardsinitindex = false
         //var reminder_twentyfive = false
@@ -314,7 +314,16 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
 //        }
 //        tts!!.speak(text, TextToSpeech.QUEUE_ADD, null,"")
     } //End of onCreate
-
+    public fun onInit(textToSpeechEngine:TextToSpeech){
+        val textToSpeechEngine: TextToSpeech by lazy {
+            TextToSpeech(this,
+                TextToSpeech.OnInitListener { status ->
+                    if (status == TextToSpeech.SUCCESS) {
+                        textToSpeechEngine.language = Locale.US
+                    }
+                })
+        }
+    }
     public override fun onResume() {
         super.onResume()
         run()
@@ -326,6 +335,14 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         super.onPause()
     }
     override fun run() {
+//        val textToSpeechEngine: TextToSpeech by lazy {
+//            TextToSpeech(this,
+//                TextToSpeech.OnInitListener { status ->
+//                    if (status == TextToSpeech.SUCCESS) {
+//                        textToSpeechEngine.language = Locale.US
+//                    }
+//                })
+//        }
         //Get position
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -379,7 +396,8 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         Location.distanceBetween(current_latitude,current_longitude,markerTrack.latitude,markerTrack.longitude,result)
                         val text = "Distance to ${markerTrack.name} is ${result[0].toInt()} meters ${convertClockPosition(current_direction,result[1])}."
                         Toast.makeText(this@MainActivity,text,Toast.LENGTH_LONG).show()
-                        textToSpeechEngine.speak(text,TextToSpeech.QUEUE_FLUSH, null)//TODO: Make sure queue ADD is the correct thing
+                        textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)//TODO: Make sure queue ADD is the correct thing
+                        textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)
                         markerTrack.name = "" //TODO: Double check queue flush
                     }
                     //Update tracking vector
@@ -412,13 +430,12 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     }
                     //Check for nearby markers
                     var (nearestMarkerDistance,nearestMarker,nearestMarkerBearing) = nearestMarkerNoLocation(current_latitude,current_longitude)
-                    if(nearestMarkerDistance<15 && nearestMarker.routeName!=running_route && nearestMarker.name != nearby_marker){
+                    if(nearestMarkerDistance<15 && nearestMarker.routeName!=running_route && !(nearestMarker.name in nearby_marker)){
                         val text = "Nearby marker ${nearestMarker.name} is ${nearestMarkerDistance.toInt()} meters ${convertClockPosition(current_direction,nearestMarkerBearing)}"
                         Toast.makeText(this@MainActivity,text,Toast.LENGTH_SHORT)
                         textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD,null)
                         //Flag
-                        nearby_marker = nearestMarker.name
-
+                        nearby_marker += nearestMarker.name
                     }
                     if (running_route != "") {
                         if (finished) {
@@ -453,14 +470,16 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                             //val distance_ten:Int = ((Math.ceil(distance/10.0))*10).toInt()
                             if(routeStarted){
                                 val text = "${running_route} started. First marker ${markers[current_marker_index].name} is  ${distance_int} meters ${convertClockPosition(current_direction,result[1])}."
-                                textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
+                                val ret = textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
+                                println(ret)
+                                //val ret = textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
                                 Toast.makeText(this@MainActivity,text, Toast.LENGTH_SHORT).show()
                                 routeStarted = false
                             }
-                            if((distance_int % 100) < 10 ){
+                            if((distance_int % 100) < 1 ){
                                 reminder = true
                             }
-                            if((distance_int % 50)<5 && distance_int<100){
+                            if((distance_int % 50) < 1 && distance_int<100){
                                 reminder = true
                             }
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance_int}, ${bearing} , accuracy(%): ${accuracy} ")
@@ -497,7 +516,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 msg.show()
                                 textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)
                                 current_marker_index = current_marker_index + 1
-                            } else if(current_marker_index == markers.size - 1){
+                            } else if(distance<threshold && current_marker_index == markers.size - 1){
                                 finished = true
                             }
                             if (done == true) {
@@ -548,7 +567,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 current_marker_index = current_marker_index - 1
                             } else {
                                 finished = true //TODO: This used to be current_marker decrement
-                                finished = true //TODO: This used to be current_marker decrement
+                                //finished = true //TODO: This used to be current_marker decrement
                             }
                             if (current_marker_index == 0) {
                                 println("Arrived at final destination")
