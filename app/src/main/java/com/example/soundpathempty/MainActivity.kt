@@ -476,10 +476,10 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 Toast.makeText(this@MainActivity,text, Toast.LENGTH_SHORT).show()
                                 routeStarted = false
                             }
-                            if((distance_int % 100) < 1 ){
+                            if((distance_int % 100) < 5 ){ //Add
                                 reminder = true
                             }
-                            if((distance_int % 50) < 1 && distance_int<100){
+                            if((distance_int % 50) < 5 && distance_int<100){
                                 reminder = true
                             }
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance_int}, ${bearing} , accuracy(%): ${accuracy} ")
