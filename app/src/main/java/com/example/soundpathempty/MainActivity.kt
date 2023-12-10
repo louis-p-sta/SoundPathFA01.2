@@ -435,7 +435,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         Toast.makeText(this@MainActivity,text,Toast.LENGTH_SHORT)
                         textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD,null)
                         //Flag
-                        nearby_marker += nearestMarker.name
+                        nearby_marker += nearestMarker.name //Added this for nearby markers...
                     }
                     if (running_route != "") {
                         if (finished) {
@@ -448,10 +448,10 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         val markers = data[0].markers
                         val result: FloatArray = FloatArray(3)
                         if(forwardsinitindex){
-                            current_marker_index = 0
+                            current_marker_index = 1
                             forwardsinitindex = false
                         }else if(backwardsinitindex){
-                            current_marker_index = markers.size -1
+                            current_marker_index = markers.size - 2
                             backwardsinitindex = false
                         }
                         //val latitude_test = 0.0
