@@ -469,7 +469,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                             val bearing = result[1].toInt()
                             //val distance_ten:Int = ((Math.ceil(distance/10.0))*10).toInt()
                             if(routeStarted){
-                                val text = "${running_route} started. First marker ${markers[current_marker_index].name} is  ${distance_int} meters ${convertClockPosition(current_direction,result[1])}."
+                                val text = "${running_route} started. Next marker ${markers[current_marker_index].name} is  ${distance_int} meters ${convertClockPosition(current_direction,result[1])}."
                                 val ret = textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
                                 println(ret)
                                 //val ret = textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
