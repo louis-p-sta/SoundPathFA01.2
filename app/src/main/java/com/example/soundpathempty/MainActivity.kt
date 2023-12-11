@@ -38,8 +38,8 @@ import java.util.Locale
 
 
 private const val PRIORITY_HIGH_ACCURACY = 100
-private const val threshold = 15
-private const val TIMEOUT:Long = 2000 //TODO: This used to be 5 seconds
+private const val threshold = 15 //Threshold in meters for marker detection
+private const val TIMEOUT:Long = 2000 //Interval at which application polls user location.
 
 //Test de commit
 class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed to declare abstract class here.
@@ -113,6 +113,9 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
         var nearby_marker:Array<String> = arrayOf("")
         var backwardsinitindex = false
         var forwardsinitindex = false
+        //Status flags
+        var distanceReminders = true
+        var autoMarkerDetect = true
         //var reminder_twentyfive = false
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -430,7 +433,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     }
                     //Check for nearby markers
                     var (nearestMarkerDistance,nearestMarker,nearestMarkerBearing) = nearestMarkerNoLocation(current_latitude,current_longitude)
-                    if(nearestMarkerDistance<15 && nearestMarker.routeName!=running_route && !(nearestMarker.name in nearby_marker)){
+                    if(nearestMarkerDistance<15 && nearestMarker.routeName!=running_route && !(nearestMarker.name in nearby_marker) && autoMarkerDetect){
                         val text = "Nearby marker ${nearestMarker.name} is ${nearestMarkerDistance.toInt()} meters ${convertClockPosition(current_direction,nearestMarkerBearing)}"
                         Toast.makeText(this@MainActivity,text,Toast.LENGTH_SHORT)
                         textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD,null)
@@ -448,10 +451,10 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         val markers = data[0].markers
                         val result: FloatArray = FloatArray(3)
                         if(forwardsinitindex){
-                            current_marker_index = 1
+                            current_marker_index = 0
                             forwardsinitindex = false
                         }else if(backwardsinitindex){
-                            current_marker_index = markers.size - 2
+                            current_marker_index = markers.size - 1
                             backwardsinitindex = false
                         }
                         //val latitude_test = 0.0
@@ -476,10 +479,10 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 Toast.makeText(this@MainActivity,text, Toast.LENGTH_SHORT).show()
                                 routeStarted = false
                             }
-                            if((distance_int % 100) < 5 ){ //Add
+                            if((distance_int % 100) < 5 && distanceReminders ){ //Add
                                 reminder = true
                             }
-                            if((distance_int % 50) < 5 && distance_int<100){
+                            if((distance_int % 50) < 5 && distance_int<100 && distanceReminders){
                                 reminder = true
                             }
                             println("Distance between you and ${markers[current_marker_index].name} : ${distance_int}, ${bearing} , accuracy(%): ${accuracy} ")
