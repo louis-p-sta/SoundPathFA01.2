@@ -297,9 +297,9 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     } else if(running_route != ""){
                         running_route = ""
                         current_marker_index = 0
-                        Toast.makeText(this@MainActivity,
-                            "Route terminated",
-                            Toast.LENGTH_LONG).show()
+//                        Toast.makeText(this@MainActivity,
+//                            "Route terminated",
+//                            Toast.LENGTH_LONG).show()
                         recordButton.text = "RECORD"
                     }
                 }
@@ -362,11 +362,11 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            Toast.makeText(
-                this@MainActivity,
-                "Locations permissions not granted!",
-                Toast.LENGTH_LONG
-            ).show()
+//            Toast.makeText(
+//                this@MainActivity,
+//                "Locations permissions not granted!",
+//                Toast.LENGTH_LONG
+//            ).show()
             return
         }
         //var current_latitude: Double = 0.0
@@ -391,14 +391,14 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                         accuracy = location.accuracy
                         intAccuracy = accuracy.toInt()
                     } else{
-                        Toast.makeText(this@MainActivity,"Null location!", Toast.LENGTH_LONG).show()
+                        //Toast.makeText(this@MainActivity,"Null location!", Toast.LENGTH_LONG).show()
                     }
                     //Marker check track
                     if(markerTrack.name !=""){
                         var result = FloatArray(3)
                         Location.distanceBetween(current_latitude,current_longitude,markerTrack.latitude,markerTrack.longitude,result)
                         val text = "Distance to ${markerTrack.name} is ${result[0].toInt()} meters ${convertClockPosition(current_direction,result[1])}."
-                        Toast.makeText(this@MainActivity,text,Toast.LENGTH_LONG).show()
+                        //Toast.makeText(this@MainActivity,text,Toast.LENGTH_LONG).show()
                         textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)//TODO: Make sure queue ADD is the correct thing
                         textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)
                         markerTrack.name = "" //TODO: Double check queue flush
@@ -435,7 +435,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     var (nearestMarkerDistance,nearestMarker,nearestMarkerBearing) = nearestMarkerNoLocation(current_latitude,current_longitude)
                     if(nearestMarkerDistance<15 && nearestMarker.routeName!=running_route && !(nearestMarker.name in nearby_marker) && autoMarkerDetect){
                         val text = "Nearby marker ${nearestMarker.name} is ${nearestMarkerDistance.toInt()} meters ${convertClockPosition(current_direction,nearestMarkerBearing)}"
-                        Toast.makeText(this@MainActivity,text,Toast.LENGTH_SHORT)
+                        //Toast.makeText(this@MainActivity,text,Toast.LENGTH_SHORT)
                         textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD,null)
                         //Flag
                         nearby_marker += nearestMarker.name //Added this for nearby markers...
@@ -476,7 +476,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                 val ret = textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
                                 println(ret)
                                 //val ret = textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
-                                Toast.makeText(this@MainActivity,text, Toast.LENGTH_SHORT).show()
+                                //Toast.makeText(this@MainActivity,text, Toast.LENGTH_SHORT).show()
                                 routeStarted = false
                             }
                             if((distance_int % 100) < 5 && distanceReminders ){ //Add
@@ -493,11 +493,11 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                     text,
                                     Toast.LENGTH_SHORT
                                 )
-                                msg.show()
+                                //msg.show()
                                 if(reminder) {
                                     textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
                                     reminder = false
-                                    Toast.makeText(this@MainActivity,"Distance reminder in effect (${distance_int}) meters, ${markers[current_marker_index].name}.",Toast.LENGTH_SHORT)
+                                    //Toast.makeText(this@MainActivity,"Distance reminder in effect (${distance_int}) meters, ${markers[current_marker_index].name}.",Toast.LENGTH_SHORT)
                                 }
                             }
                             if (distance < threshold && current_marker_index < markers.size - 1) { //Notify if within 5 metres
@@ -516,7 +516,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                     text,
                                     Toast.LENGTH_SHORT
                                 )
-                                msg.show()
+                                //msg.show()
                                 textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)
                                 current_marker_index = current_marker_index + 1
                             } else if(distance<threshold && current_marker_index == markers.size - 1){
@@ -524,11 +524,11 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                             }
                             if (done == true) {
                                 println("Arrived at final destination")
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    "Arrived at ${markers[current_marker_index].name}. Route finished!",
-                                    Toast.LENGTH_LONG
-                                ).show()
+//                                Toast.makeText(
+//                                    this@MainActivity,
+//                                    "Arrived at ${markers[current_marker_index].name}. Route finished!",
+//                                    Toast.LENGTH_LONG
+//                                ).show()
                                 textToSpeechEngine.speak("Arrived at ${markers[current_marker_index].name}. Route finished!",TextToSpeech.QUEUE_ADD, null)
                                 //TODO:Fix going out of bounds exception.
                                 //TODO: Screen persistence
@@ -557,7 +557,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                     text,
                                     Toast.LENGTH_SHORT
                                 )
-                                msg.show()
+                                //msg.show()
                                 //textToSpeechEngine.speak(text,TextToSpeech.QUEUE_ADD, null)
                             }
                             if(distance < threshold && current_marker_index != 0) { //Notify if within 5 metres
@@ -566,7 +566,7 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                                     "Arrived at marker ${markers[current_marker_index].name}. Marker comment : ${markers[current_marker_index]}. Next marker ${markers[current_marker_index - 1].name}, ${distance} meters away.",
                                     Toast.LENGTH_SHORT
                                 )
-                                msg.show()
+                                //msg.show()
                                 current_marker_index = current_marker_index - 1
                             } else {
                                 finished = true //TODO: This used to be current_marker decrement
@@ -574,11 +574,11 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                             }
                             if (current_marker_index == 0) {
                                 println("Arrived at final destination")
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    "Route finished!",
-                                    Toast.LENGTH_SHORT
-                                )
+//                                Toast.makeText(
+//                                    this@MainActivity,
+//                                    "Route finished!",
+//                                    Toast.LENGTH_SHORT
+//                                )
                                 running_route = ""
                                 recordButton.text = "RECORD"
                             }
@@ -680,21 +680,21 @@ class MainActivity : ComponentActivity(), Runnable { //TODO: Not sure if allowed
                     if (closestMarker == "None") {
                         val text = "No nearby markers."
                         textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
-                        Toast.makeText(
-                            this@MainActivity,
-                            text,
-                            Toast.LENGTH_LONG
-                        ).show()
+//                        Toast.makeText(
+//                            this@MainActivity,
+//                            text,
+//                            Toast.LENGTH_LONG
+//                        ).show()
                     } else {
                         val text =
                             "Nearest marker is ${closestMarker}, ${closestDistance.toInt()} meters ${convertClockPosition(
                                 current_direction,closestBearing)}"
                         textToSpeechEngine.speak(text, TextToSpeech.QUEUE_ADD, null)
-                        Toast.makeText(
-                            this@MainActivity,
-                            text,
-                            Toast.LENGTH_LONG
-                        ).show()
+//                        Toast.makeText(
+//                            this@MainActivity,
+//                            text,
+//                            Toast.LENGTH_LONG
+//                        ).show()
                     }
                 }
             }
